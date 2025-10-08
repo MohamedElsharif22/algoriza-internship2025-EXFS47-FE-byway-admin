@@ -41,36 +41,39 @@ export const courseService = {
   },
 
   getCourseById: async (id: number): Promise<Course | null> => {
-    const response = await api.get<ApiResponse<Course>>(`/Courses/${id}`);
+    // Use the correct endpoint and map the response shape
+    const response = await api.get(`/Courses/${id}`);
+    // If response.data is the course object directly, return it
+    if (response.data && typeof response.data === 'object' && response.data.id) {
+      return response.data;
+    }
+    // If wrapped in { data: ... }
     return response.data?.data ?? null;
   },
 
   createCourse: async (data: FormData): Promise<Course | null> => {
-    const response = await api.post<ApiResponse<Course>>('/Courses', data, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    // Let the browser/axios set the Content-Type (including boundary) for multipart/form-data
+    const response = await api.post<ApiResponse<Course>>('/Courses', data);
     return response.data?.data ?? null;
   },
 
   updateCourse: async (id: number, data: FormData): Promise<Course | null> => {
-    const response = await api.put<ApiResponse<Course>>(`/Courses/${id}`, data, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    const response = await api.put<ApiResponse<Course>>(`/Courses/${id}`, data);
     return response.data?.data ?? null;
   },
 
   deleteCourse: async (id: number): Promise<string | void> => {
-    // Use the explicit API path as requested: /api/Courses/{id}
-    const response = await api.delete<ApiResponse<string>>(`/api/Courses/${id}`);
+    // DELETE /Courses/{id} — let the axios instance already include the base '/api' prefix
+    const response = await api.delete<ApiResponse<string>>(`/Courses/${id}`);
     return response.data?.message;
   },
 
   getAllCategories: async (): Promise<Category[]> => {
-    const response = await api.get<ApiResponse<Category[]>>('/Courses/categories');
-    return response.data?.data ?? [];
+    const response = await api.get('/Courses/categories');
+    // API may return either an ApiResponse wrapper ({ data: [...] }) or the raw array.
+    const payload = response.data;
+    if (Array.isArray(payload)) return payload as Category[];
+    if (payload && Array.isArray(payload.data)) return payload.data as Category[];
+    return [];
   },
 };

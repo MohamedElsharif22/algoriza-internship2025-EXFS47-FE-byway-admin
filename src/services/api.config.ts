@@ -4,9 +4,7 @@ const BASE_URL = 'https://localhost:7228/api';
 
 const api = axios.create({
   baseURL: BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  // Do not set a global Content-Type here. Let axios/browser set it per-request.
 });
 
 // Request interceptor for adding auth token

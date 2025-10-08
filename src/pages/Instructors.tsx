@@ -14,6 +14,7 @@ import Dialog from '../components/ui/Dialog';
 import DeleteConfirmation from '../components/ui/DeleteConfirmation';
 import Pagination from '../components/ui/Pagination';
 import InstructorForm from '../components/ui/InstructorForm';
+import PageHeader from '../components/layout/PageHeader';
 import { instructorsAtom, instructorFiltersAtom, selectedInstructorAtom, instructorLoadingAtom } from '../store/instructor.store';
 import { instructorService } from '../services/instructor.service';
 // types imported where needed in other modules
@@ -93,16 +94,10 @@ const InstructorsPage = () => {
   // Columns configuration removed — page renders a custom table below
 
   return (
-    <div className="px-2 pt-8 pb-2">
-      {/* Header with breadcrumbs */}
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-slate-800">Instructors</h1>
-        <div className="mt-2 text-sm text-slate-400 font-medium">
-          Dashboard <span className="mx-1">/</span> <span className="text-slate-500">Instructors</span>
-        </div>
-        <hr className="mt-4" />
-      </div>
+    <div>
+      <PageHeader title="Instructors" subtitle={<><span className="text-slate-500">Dashboard</span> <span className="mx-1">/</span> <span>Instructors</span></>} />
 
+      <div className="px-6">
       {/* Card with table and controls */}
       <div className="bg-white rounded-2xl shadow p-8">
         <div className="flex items-center justify-between mb-6">
@@ -294,6 +289,7 @@ const InstructorsPage = () => {
         targetName={selectedInstructor?.name}
       />
     </div>
+  </div>
   );
 };
 

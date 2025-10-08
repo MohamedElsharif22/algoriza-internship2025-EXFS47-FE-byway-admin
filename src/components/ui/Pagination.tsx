@@ -15,9 +15,9 @@ const Pagination: React.FC<Props> = ({ currentPage, totalPages, onPageChange, cl
 
     return (
       <div className={className}>
-        <div className="inline-flex rounded-full p-1" style={{ boxShadow: '0 8px 30px rgba(37,99,235,0.14)' }}>
+        <div className="inline-flex rounded" style={{ boxShadow: '0 0px 5px rgba(37,99,235,0.14)' }}>
           <nav
-            className="inline-flex items-center rounded-full bg-white px-1 py-1 overflow-hidden"
+            className="inline-flex items-center rounded bg-white overflow-hidden"
             aria-label="Pagination"
           >
           <button

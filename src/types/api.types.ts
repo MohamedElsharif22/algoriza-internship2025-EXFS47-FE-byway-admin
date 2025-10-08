@@ -43,12 +43,22 @@ export interface Course {
   coverPictureUrl?: string;
   lecturesCount?: number;
   durationInMinutes?: number;
+  durationInHours?: number;
   instructorId?: number;
   instructorName?: string;
   categoryId?: number;
   categoryName?: string;
+  courseLevel?: number;
+  contents?: CourseContent[];
   createdAt?: string;
   updatedAt?: string;
+}
+
+export interface CourseContent {
+  id: number;
+  name: string;
+  lecturesCount: number;
+  durationInHours: number;
 }
 
 export interface CourseFilters {

@@ -10,6 +10,8 @@ import Unauthorized from './pages/auth/Unauthorized';
 import Dashboard from './pages/Dashboard';
 import Instructors from './pages/Instructors';
 import Courses from './pages/Courses';
+import AddCourse from './pages/AddCourse';
+import EditCourse from './pages/EditCourse';
 import NotFound from './pages/NotFound';
 
 function App() {
@@ -48,6 +50,26 @@ function App() {
               <ProtectedRoute>
                 <Layout>
                   <Courses />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/courses/add"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <AddCourse />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/courses/edit/:id"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <EditCourse />
                 </Layout>
               </ProtectedRoute>
             }

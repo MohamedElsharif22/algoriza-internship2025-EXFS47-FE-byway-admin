@@ -2,7 +2,7 @@ import { ButtonHTMLAttributes, forwardRef } from 'react';
 import clsx from 'clsx';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'outline' | 'danger';
+  variant?: 'primary' | 'secondary' | 'outline' | 'danger' | 'dark';
   size?: 'sm' | 'md' | 'lg';
   isLoading?: boolean;
 }
@@ -19,6 +19,8 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             'bg-gray-100 text-gray-700 hover:bg-gray-200': variant === 'secondary',
             'border border-gray-300 text-gray-700 hover:bg-gray-50': variant === 'outline',
             'bg-red-600 text-white hover:bg-red-700': variant === 'danger',
+            // reusable dark button variant
+            'bg-black text-white hover:bg-gray-900 shadow-sm': variant === 'dark',
             'px-3 py-1.5 text-sm': size === 'sm',
             'px-4 py-2 text-base': size === 'md',
             'px-6 py-3 text-lg': size === 'lg',
@@ -60,3 +62,10 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 Button.displayName = 'Button';
 
 export default Button;
+
+// Small convenience export for a dark button pre-configured for reuse
+export const DarkButton = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => (
+  <Button ref={ref as any} variant="dark" {...props} />
+));
+
+DarkButton.displayName = 'DarkButton';

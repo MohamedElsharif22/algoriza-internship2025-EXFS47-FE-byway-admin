@@ -133,10 +133,10 @@ const CourseForm = ({ course, categories, onSubmit, onCancel }: CourseFormProps)
             {formik.errors.coverPicture as string}
           </div>
         )}
-        {course?.coverPicture && (
+        {(course?.coverPictureUrl || course?.coverPicture) && (
           <div className="mt-2">
             <img
-              src={course.coverPicture}
+              src={course.coverPictureUrl ?? course.coverPicture}
               alt="Current cover"
               className="h-32 w-48 object-cover rounded"
             />
