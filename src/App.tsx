@@ -12,6 +12,7 @@ import Instructors from './pages/Instructors';
 import Courses from './pages/Courses';
 import AddCourse from './pages/AddCourse';
 import EditCourse from './pages/EditCourse';
+import ViewCourse from './pages/ViewCourse';
 import NotFound from './pages/NotFound';
 
 function App() {
@@ -70,6 +71,16 @@ function App() {
               <ProtectedRoute>
                 <Layout>
                   <EditCourse />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/courses/view/:id"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <ViewCourse />
                 </Layout>
               </ProtectedRoute>
             }

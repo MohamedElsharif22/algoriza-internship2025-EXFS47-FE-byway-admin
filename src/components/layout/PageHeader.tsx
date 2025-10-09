@@ -21,8 +21,8 @@ const PageHeader = ({ title, subtitle }: PageHeaderProps) => {
 
         <div className="flex items-center">
           <div className="relative">
-            <button className="w-14 h-14 bg-white rounded-full shadow flex items-center justify-center">
-              <BellIcon className="w-6 h-6 text-slate-600" />
+            <button aria-label="Notifications" title="Notifications" className="w-14 h-14 bg-white rounded-full shadow flex items-center justify-center text-muted">
+              <BellIcon className="w-6 h-6 text-slate-600 " />
             </button>
             <span className="absolute -top-0.5 -right-0.5 w-3 h-3 bg-red-500 rounded-full ring-2 ring-white"></span>
           </div>

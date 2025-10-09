@@ -44,6 +44,8 @@ export interface Course {
   lecturesCount?: number;
   durationInMinutes?: number;
   durationInHours?: number;
+  // API may return a human-readable level string (e.g., 'Beginner', 'Intermediate')
+  level?: string;
   instructorId?: number;
   instructorName?: string;
   categoryId?: number;

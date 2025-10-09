@@ -10,20 +10,35 @@ import {
 export const courseService = {
   getAllCourses: async (filters: CourseFilters): Promise<PaginatedResponse<Course>> => {
     // Map local filter keys to API query params and enforce PageSize cap of 30
-    const params: any = {};
-  const requestedPageSize = Math.min(30, filters.pageSize ?? 9);
-  params.PageSize = requestedPageSize;
-    params.PageIndex = filters.pageIndex ?? 1;
-    if (filters.search) params.Search = filters.search;
-    if (filters.sort) params.Sort = filters.sort;
-    if (filters.instructorId) params.InstructorId = filters.instructorId;
-    if (filters.categories) params.Categories = filters.categories;
+    const requestedPageSize = Math.min(30, filters.pageSize ?? 9);
 
-  const response = await api.get<any>('/Courses', { params });
-        // Handle both shapes: ApiResponse<T> -> { data: T } or direct payload
-        console.log("response",response);
-  const payload = response.data ?? {};
-        console.log("Payload",response);
+    // Build query string using URLSearchParams to allow repeated keys like Categories=1&Categories=2
+    const params = new URLSearchParams();
+    params.append('PageSize', String(requestedPageSize));
+    params.append('PageIndex', String(filters.pageIndex ?? 1));
+
+    if (filters.search !== undefined) params.append('Search', String(filters.search ?? ''));
+    if (filters.sort !== undefined) params.append('Sort', String(filters.sort));
+    if (filters.instructorId !== undefined) params.append('InstructorId', String(filters.instructorId));
+
+    if (filters.priceRange) {
+      params.append('PriceRange.Min', String(filters.priceRange.min ?? 0));
+      params.append('PriceRange.Max', String(filters.priceRange.max ?? 0));
+    }
+
+    if (filters.rangeOfLectures) {
+      params.append('RangeOfLectures.Min', String(filters.rangeOfLectures.min ?? 0));
+      params.append('RangeOfLectures.Max', String(filters.rangeOfLectures.max ?? 0));
+    }
+
+    if (filters.categories && filters.categories.length > 0) {
+      filters.categories.forEach((c) => params.append('Categories', String(c)));
+    }
+
+    const url = `/Courses?${params.toString()}`;
+      const response = await api.get<any>(url);
+      // Handle both shapes: ApiResponse<T> -> { data: T } or direct payload
+      const payload = response.data ?? {};
 
     // Normalize various possible pagination shapes into PaginatedResponse
     const data: Course[] = payload.data || [];
@@ -74,6 +89,14 @@ export const courseService = {
     const payload = response.data;
     if (Array.isArray(payload)) return payload as Category[];
     if (payload && Array.isArray(payload.data)) return payload.data as Category[];
+    return [];
+  },
+  getCourseLevels: async (): Promise<Array<{ level: string; value: number }>> => {
+    const response = await api.get('/Courses/levels');
+    const payload = response.data;
+    // API may return array directly or wrapper
+    if (Array.isArray(payload)) return payload as any;
+    if (payload && Array.isArray(payload.data)) return payload.data as any;
     return [];
   },
 };

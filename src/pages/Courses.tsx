@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAtom } from 'jotai';
 import {
   MagnifyingGlassIcon,
@@ -6,7 +6,8 @@ import {
   TrashIcon,
   EyeIcon,
 } from '@heroicons/react/24/outline';
-import Button, { DarkButton } from '../components/ui/Button';
+import { DarkButton } from '../components/ui/Button';
+import MultiSelect from '../components/ui/MultiSelect';
 import { useNavigate } from 'react-router-dom';
 import PageHeader from '../components/layout/PageHeader';
 import Dialog from '../components/ui/Dialog';
@@ -31,9 +32,16 @@ const CoursesPage = () => {
   const [loading, setLoading] = useAtom(courseLoadingAtom);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState<string>(filters.search ?? '');
+  const [filterMenuOpen, setFilterMenuOpen] = useState(false);
+  // categories will be handled inside the popover
+  const [popoverCategories, setPopoverCategories] = useState<number[] | undefined>(filters.categories);
+  const [popoverSort, setPopoverSort] = useState<1|2|3|4|5|6|undefined>(filters.sort as 1|2|3|4|5|6|undefined);
+  const [popoverPageSize, setPopoverPageSize] = useState<number | undefined>(filters.pageSize);
+  const filterMenuRef = useRef<HTMLDivElement | null>(null);
+  const filterButtonRef = useRef<HTMLButtonElement | null>(null);
   // edit flow moved to dedicated Edit Course page
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [isViewDialogOpen, setIsViewDialogOpen] = useState(false);
 
   const fetchCourses = async () => {
     setLoading(true);
@@ -65,6 +73,26 @@ const CoursesPage = () => {
   useEffect(() => {
     fetchCourses();
   }, [filters]);
+
+  // debounce searchTerm -> filters.search
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setFilters((prev) => ({ ...prev, search: searchTerm || undefined, pageIndex: 1 }));
+    }, 400);
+    return () => clearTimeout(t);
+  }, [searchTerm, setFilters]);
+
+  // close filter popover when clicking outside
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      const target = e.target as Node;
+      if (filterMenuOpen && filterMenuRef.current && !filterMenuRef.current.contains(target) && filterButtonRef.current && !filterButtonRef.current.contains(target)) {
+        setFilterMenuOpen(false);
+      }
+    };
+    window.addEventListener('click', handler);
+    return () => window.removeEventListener('click', handler);
+  }, [filterMenuOpen]);
 
   const handleAddCourse = async (formData: FormData) => {
     try {
@@ -110,7 +138,7 @@ const CoursesPage = () => {
             </div>
           }
         />
-      <div className="bg-white rounded-2xl shadow-sm">
+      <div className="bg-white rounded-2xl shadow-lg">
         <div className="p-6">
           <div className="flex items-center flex-wrap justify-between mb-6">
               <div className="flex mb-3">
@@ -122,45 +150,105 @@ const CoursesPage = () => {
             <div />
 
             <div className="flex items-center gap-4">
-              <DarkButton onClick={() => navigate('/courses/add')} className="rounded-full px-4 py-2">
+              <DarkButton onClick={() => navigate('/courses/add')} className="rounded-lg px-4 py-2 min-w-[110px] whitespace-nowrap flex-shrink-0">
                 Add Course
               </DarkButton>
 
-              <div className="flex items-center space-x-3 w-96">
-                <div className="relative w-40">
-                  <select
-                    value={(filters.categories || [])[0] ?? ''}
-                    onChange={(e) => {
-                      const categoryId = e.target.value ? Number(e.target.value) : undefined;
-                      setFilters({ ...filters, categories: categoryId ? [categoryId] : undefined, pageIndex: 1 });
-                    }}
-                    className="w-full rounded-full border-gray-200 px-4 py-2 text-sm"
-                  >
-                    <option value="">All Categories</option>
-                    {categories.map((category) => (
-                      <option key={category.id} value={category.id}>{category.name}</option>
-                    ))}
-                  </select>
-                </div>
-
+              <div className="flex items-center gap-4 w-full max-w-3xl">
+                {/* Removed inline sort & pageSize per request; only category multi-select, search and filter button remain */}
                 <div className="relative flex-1">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
                   </div>
                   <input
                     type="text"
                     placeholder="Search for Courses"
-                    value={filters.search ?? ''}
-                    onChange={(e) => setFilters({ ...filters, search: e.target.value, pageIndex: 1 })}
-                    className="pl-10 w-full rounded-full border-gray-200 px-3 py-2 text-sm"
+                    value={searchTerm}
+                    onChange={(e) => { setSearchTerm(e.target.value); }}
+                    className="pl-12 w-full rounded-lg border border-gray-200 px-4 py-3 text-sm bg-white shadow-sm"
                   />
                 </div>
 
-                <button className="p-2 rounded-full border border-gray-200 bg-white">
-                  <svg className="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L15 12.414V19a1 1 0 01-1.447.894l-4-2A1 1 0 019 17v-4.586L3.293 6.707A1 1 0 013 6V4z" />
-                  </svg>
-                </button>
+                <div className="flex items-center">
+                  <div className="relative">
+                    <button
+                      ref={filterButtonRef}
+                      title="Filter"
+                      onClick={() => {
+                        // sync popover state from global filters when opening
+                        setPopoverSort(filters.sort);
+                        setPopoverPageSize(filters.pageSize);
+                        setFilterMenuOpen((s) => !s);
+                      }}
+                      className="inline-flex items-center justify-center h-10 w-10 rounded-lg border border-gray-200 bg-white shadow-sm"
+                    >
+                      <svg className="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L15 12.414V19a1 1 0 01-1.447.894l-4-2A1 1 0 019 17v-4.586L3.293 6.707A1 1 0 013 6V4z" />
+                      </svg>
+                    </button>
+
+                    {filterMenuOpen && (
+                      <div ref={filterMenuRef} className="absolute right-0 mt-2 w-72 bg-white border border-gray-100 rounded-lg shadow-lg p-3 z-40">
+                        <div className="space-y-3">
+                          <div>
+                            <label className="block text-xs text-gray-500 mb-1">Categories</label>
+                            <MultiSelect
+                              options={categories.map((c) => ({ id: c.id, name: c.name }))}
+                              value={popoverCategories ?? []}
+                              onChange={(selected) => setPopoverCategories(selected.length ? selected : undefined)}
+                              placeholder="All Categories"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-xs text-gray-500 mb-1">Sort</label>
+                            <select aria-label="Sort options" value={popoverSort ?? 5} onChange={(e) => setPopoverSort(Number(e.target.value) as 1|2|3|4|5|6)} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm">
+                              <option value={5}>Newest</option>
+                              <option value={6}>Oldest</option>
+                              <option value={1}>Price: Low to High</option>
+                              <option value={2}>Price: High to Low</option>
+                              <option value={3}>Rating: Low to High</option>
+                              <option value={4}>Rating: High to Low</option>
+                            </select>
+                          </div>
+
+                          <div>
+                            <label className="block text-xs text-gray-500 mb-1">Per page</label>
+                            <select aria-label="Per page" value={popoverPageSize ?? 9} onChange={(e) => setPopoverPageSize(Number(e.target.value))} className="w-full rounded-lg border border-gray-200 px-3 py-2 text-sm">
+                              <option value={6}>6</option>
+                              <option value={9}>9</option>
+                              <option value={12}>12</option>
+                              <option value={24}>24</option>
+                            </select>
+                          </div>
+
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => {
+                                // Apply categories, sort and pageSize to global filters and close
+                                setFilters({ ...filters, categories: popoverCategories, sort: popoverSort, pageSize: popoverPageSize, pageIndex: 1 });
+                                setFilterMenuOpen(false);
+                              }}
+                              className="flex-1 bg-primary-600 text-white px-3 py-2 rounded-lg text-sm"
+                            >
+                              Apply
+                            </button>
+                            <button
+                              onClick={() => {
+                                setFilters({ ...filters, search: undefined, pageIndex: 1, sort: 5, pageSize: 9 });
+                                setFilterMenuOpen(false);
+                              }}
+                              className="flex-1 border border-gray-200 px-3 py-2 rounded-lg text-sm"
+                            >
+                              Reset
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -193,21 +281,25 @@ const CoursesPage = () => {
                       <span className="text-xs text-gray-500">{Math.round(course.rating ?? 0)}</span>
                     </div>
 
-                    <p className="text-xs text-gray-500 mb-3">{course.durationInMinutes ?? 0} Total Hours. {course.lecturesCount ?? 0} Lectures. Beginner</p>
+                    <p className="text-xs text-gray-500 mb-3">
+                      {(typeof course.durationInHours === 'number'
+                        ? course.durationInHours
+                        : (typeof course.durationInMinutes === 'number' ? Math.round((course.durationInMinutes || 0) / 60) : 0))} Total Hours. {course.lecturesCount ?? 0} Lectures. Beginner
+                    </p>
 
                     <div className="flex items-center justify-between">
                       <div className="text-lg font-bold text-gray-900">${(course.price ?? 0).toFixed(2)}</div>
 
                       <div className="flex items-center gap-2">
-                        <button onClick={() => { setSelectedCourse(course); setIsViewDialogOpen(true); }} className="p-2 bg-white border border-gray-100 rounded-full text-gray-500 hover:text-gray-900">
+                        <button title="View" onClick={() => navigate(`/courses/view/${course.id}`)} className="p-2 bg-white border border-gray-100 rounded-full text-gray-500 hover:text-gray-900">
                           <EyeIcon className="h-4 w-4" />
                         </button>
-                        <button onClick={() => {
+                        <button title="Edit" onClick={() => {
                           navigate(`/courses/edit/${course.id}`);
                         }} className="p-2 bg-white border border-gray-100 rounded-full text-gray-500 hover:text-gray-900">
                           <PencilIcon className="h-4 w-4" />
                         </button>
-                        <button onClick={() => { setSelectedCourse(course); setIsDeleteDialogOpen(true); }} className="p-2 bg-white border border-gray-100 rounded-full text-red-500 hover:text-red-700">
+                        <button title="Delete" onClick={() => { setSelectedCourse(course); setIsDeleteDialogOpen(true); }} className="p-2 bg-white border border-gray-100 rounded-full text-red-500 hover:text-red-700">
                           <TrashIcon className="h-4 w-4" />
                         </button>
                       </div>
@@ -243,70 +335,7 @@ const CoursesPage = () => {
 
       {/* Edit flow moved to dedicated page: /courses/edit/:id */}
 
-      {/* View Course Dialog */}
-      <Dialog
-        open={isViewDialogOpen}
-        onClose={() => setIsViewDialogOpen(false)}
-        title="Course Details"
-      >
-        {selectedCourse && (
-          <div className="space-y-4">
-            <div className="aspect-w-16 aspect-h-9">
-              <img
-                src={selectedCourse?.coverPicture}
-                alt={selectedCourse?.title}
-                className="w-full h-full object-cover rounded-lg"
-              />
-            </div>
-            <div>
-              <h3 className="text-lg font-medium text-gray-900">
-                {selectedCourse?.title}
-              </h3>
-              <p className="mt-1 text-sm text-gray-500">
-                {selectedCourse?.description}
-              </p>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <h4 className="text-sm font-medium text-gray-900">Category</h4>
-                <p className="mt-1 text-sm text-gray-500">
-                  {categories.find((c) => c.id === selectedCourse?.categoryId)?.name}
-                </p>
-              </div>
-              <div>
-                <h4 className="text-sm font-medium text-gray-900">Price</h4>
-                <p className="mt-1 text-sm text-gray-500">
-                  ${selectedCourse?.price.toFixed(2)}
-                </p>
-              </div>
-              <div>
-                <h4 className="text-sm font-medium text-gray-900">Rating</h4>
-                <div className="mt-1 flex items-center">
-                  <span className="text-yellow-400">★</span>
-                  <span className="ml-1 text-sm text-gray-900">
-                    {selectedCourse?.rating}
-                  </span>
-                </div>
-              </div>
-              <div>
-                <h4 className="text-sm font-medium text-gray-900">Instructor</h4>
-                <p className="mt-1 text-sm text-gray-500">
-                  {selectedCourse?.instructorId}
-                </p>
-              </div>
-            </div>
-            <div className="mt-5">
-              <Button
-                variant="secondary"
-                onClick={() => setIsViewDialogOpen(false)}
-                className="w-full"
-              >
-                Close
-              </Button>
-            </div>
-          </div>
-        )}
-      </Dialog>
+      {/* View handled by dedicated page: /courses/view/:id */}
 
       {/* Delete Confirmation Dialog */}
       <DeleteConfirmation

@@ -1,96 +1,169 @@
-
+import React from 'react';
 import { useFormik, FormikProvider } from 'formik';
 import * as Yup from 'yup';
 import Button from './Button';
 import { TrashIcon } from '@heroicons/react/24/outline';
 
 interface ContentItem {
-  name: string;
-  lecturesNumber: number | '';
-  time: number | '';
+	id?: number;
+	name: string;
+	lecturesCount: number | '';
+	durationInHours: number | '';
 }
 
 interface Props {
-  initialContents?: ContentItem[];
-  onBack: () => void;
-  onSubmit: (contents: ContentItem[]) => void;
+	initialContents?: ContentItem[];
+	onBack: () => void;
+	onSubmit: (contents: ContentItem[]) => void;
+	disabled?: boolean;
 }
 
-const ContentComponent = ({ idx, formik, canDelete, onDelete }: { idx: number; formik: any; canDelete: boolean; onDelete: () => void }) => (
-  <div className="bg-gray-50 rounded-lg p-6 mb-4 border border-gray-100">
-    <div className="space-y-4">
-      <div>
-        <label className="block text-gray-900 font-medium mb-2">Name</label>
-        <input className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" {...formik.getFieldProps(`contents.${idx}.name`)} placeholder="Write here" />
-        {formik.touched.contents?.[idx]?.name && formik.errors.contents?.[idx]?.name && <p className="text-red-500 text-sm mt-1">{formik.errors.contents[idx].name}</p>}
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-gray-900 font-medium mb-2">Lectures Number</label>
-          <input type="number" className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" {...formik.getFieldProps(`contents.${idx}.lecturesNumber`)} placeholder="Write here" />
-          {formik.touched.contents?.[idx]?.lecturesNumber && formik.errors.contents?.[idx]?.lecturesNumber && <p className="text-red-500 text-sm mt-1">{formik.errors.contents[idx].lecturesNumber}</p>}
-        </div>
-        <div>
-          <label className="block text-gray-900 font-medium mb-2">Time</label>
-          <input type="number" className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm" {...formik.getFieldProps(`contents.${idx}.time`)} placeholder="Write here" />
-          {formik.touched.contents?.[idx]?.time && formik.errors.contents?.[idx]?.time && <p className="text-red-500 text-sm mt-1">{formik.errors.contents[idx].time}</p>}
-        </div>
-      </div>
-      {canDelete && (
-        <button type="button" onClick={onDelete} className="inline-flex items-center px-3 py-2 bg-red-50 text-red-600 rounded-lg mt-2">
-          <TrashIcon className="w-5 h-5 mr-2" /> Delete
-        </button>
-      )}
-    </div>
-  </div>
+const ContentComponent = ({ idx, formik, canDelete, onDelete, disabled }: { idx: number; formik: any; canDelete: boolean; onDelete: () => void; disabled?: boolean }) => (
+	<div className="bg-gray-50 rounded-lg p-6 mb-4 border border-gray-100">
+		<div className="space-y-4">
+			<div>
+				<label className="block text-gray-900 font-medium mb-2">Name</label>
+				{disabled ? (
+					<div className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-gray-50 text-gray-700">{String(formik.values.contents?.[idx]?.name ?? '')}</div>
+				) : (
+					<input
+						className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+						{...formik.getFieldProps(`contents.${idx}.name`)}
+						placeholder="Write here"
+					/>
+				)}
+				{formik.touched.contents?.[idx]?.name && formik.errors.contents?.[idx]?.name && (
+					<p className="text-red-500 text-sm mt-1">{formik.errors.contents[idx].name}</p>
+				)}
+			</div>
+
+			<div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+				<div>
+					<label className="block text-gray-900 font-medium mb-2">Lectures Count</label>
+					{disabled ? (
+						<div className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-gray-50 text-gray-700">{String(formik.values.contents?.[idx]?.lecturesCount ?? '')}</div>
+					) : (
+						<input
+							type="number"
+							className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+							{...formik.getFieldProps(`contents.${idx}.lecturesCount`)}
+							placeholder="Write here"
+						/>
+					)}
+					{formik.touched.contents?.[idx]?.lecturesCount && formik.errors.contents?.[idx]?.lecturesCount && (
+						<p className="text-red-500 text-sm mt-1">{formik.errors.contents[idx].lecturesCount}</p>
+					)}
+				</div>
+
+				<div>
+					<label className="block text-gray-900 font-medium mb-2">Duration In Hours</label>
+					{disabled ? (
+						<div className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-gray-50 text-gray-700">{String(formik.values.contents?.[idx]?.durationInHours ?? '')}</div>
+					) : (
+						<input
+							type="number"
+							className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+							{...formik.getFieldProps(`contents.${idx}.durationInHours`)}
+							placeholder="Write here"
+						/>
+					)}
+					{formik.touched.contents?.[idx]?.durationInHours && formik.errors.contents?.[idx]?.durationInHours && (
+						<p className="text-red-500 text-sm mt-1">{formik.errors.contents[idx].durationInHours}</p>
+					)}
+				</div>
+			</div>
+
+			{canDelete && !disabled && (
+				<button type="button" onClick={onDelete} className="inline-flex items-center px-3 py-2 bg-red-50 text-red-600 rounded-lg mt-2">
+					<TrashIcon className="w-5 h-5 mr-2" /> Delete
+				</button>
+			)}
+		</div>
+	</div>
 );
 
-const CourseContentsForm = ({ initialContents = [{ name: '', lecturesNumber: '', time: '' }], onBack, onSubmit }: Props) => {
-  const validationSchema = Yup.object({
-    contents: Yup.array().of(
-      Yup.object({
-        name: Yup.string().required('Name required'),
-        lecturesNumber: Yup.number().typeError('Required').required('Lectures required'),
-        time: Yup.number().typeError('Required').required('Time required'),
-      })
-    ),
-  });
+const CourseContentsForm: React.FC<Props> = ({
+	initialContents = [{ name: '', lecturesCount: '', durationInHours: '' }],
+	onBack,
+	onSubmit,
+	disabled = false,
+}) => {
+	const validationSchema = Yup.object({
+		contents: Yup.array().of(
+			Yup.object({
+				name: Yup.string().required('Name required'),
+				lecturesCount: Yup.number().typeError('Required').required('Lectures required'),
+				durationInHours: Yup.number().typeError('Required').required('Duration required'),
+			})
+		),
+	});
 
-  const formik = useFormik({
-    initialValues: { contents: initialContents },
-    validationSchema,
-    onSubmit: (values) => onSubmit(values.contents),
-  });
+	const normalizedInitialContents = initialContents.map((item: any) => ({
+		name: item.name ?? '',
+		lecturesCount: item.lecturesCount ?? item.lecturesNumber ?? '',
+		durationInHours: item.durationInHours ?? item.time ?? '',
+	}));
 
-  return (
-    <FormikProvider value={formik}>
-      <form onSubmit={formik.handleSubmit} className="space-y-4">
-        <h3 className="text-xl font-semibold text-gray-900 mb-2">Add Content</h3>
-        {formik.values.contents.map((_c: any, idx: number) => (
-          <ContentComponent
-            key={idx}
-            idx={idx}
-            formik={formik}
-            canDelete={formik.values.contents.length > 1}
-            onDelete={() => {
-              const arr = [...formik.values.contents];
-              arr.splice(idx, 1);
-              formik.setFieldValue('contents', arr);
-            }}
-          />
-        ))}
+	const isEditMode = Array.isArray(initialContents) && initialContents.length > 0 && initialContents.some((c) => c.id !== undefined);
 
-        <div className="border-dashed border-2 border-gray-200 p-4 rounded-lg text-center mb-4">
-          <button type="button" onClick={() => formik.setFieldValue('contents', [...formik.values.contents, { name: '', lecturesNumber: '', time: '' }])} className="text-sm text-gray-600">Add Another Content <span className="ml-1">+</span></button>
-        </div>
+	const formik = useFormik({
+		initialValues: { contents: normalizedInitialContents },
+		validationSchema,
+		onSubmit: (values) => onSubmit(values.contents),
+	});
 
-        <div className="flex justify-between items-center mt-6">
-          <Button type="button" variant="secondary" onClick={onBack} className="px-6 py-3">Cancel</Button>
-          <Button type="submit" variant="dark" className="px-6 py-3">Add</Button>
-        </div>
-      </form>
-    </FormikProvider>
-  );
+	return (
+		<FormikProvider value={formik}>
+			<form onSubmit={formik.handleSubmit} className="space-y-4">
+				<div className="flex items-center justify-between">
+					<div>
+						{!disabled && (
+							<button type="button" onClick={onBack} className="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-gray-200">
+								← Back
+							</button>
+						)}
+					</div>
+				</div>
+
+				<h3 className="text-xl font-semibold text-gray-900 mb-2">{isEditMode ? 'Edit Content' : 'Add Content'}</h3>
+
+				{formik.values.contents.map((_: any, idx: number) => (
+					<ContentComponent
+						key={idx}
+						idx={idx}
+						formik={formik}
+						canDelete={formik.values.contents.length > 1}
+						onDelete={() => {
+							const arr = [...formik.values.contents];
+							arr.splice(idx, 1);
+							formik.setFieldValue('contents', arr);
+						}}
+						disabled={disabled}
+					/>
+				))}
+
+				{!disabled && (
+					<div className="border-dashed border-2 border-gray-200 p-4 rounded-lg text-center mb-4">
+						<button type="button" onClick={() => formik.setFieldValue('contents', [...formik.values.contents, { name: '', lecturesCount: '', durationInHours: '' }])} className="text-sm text-gray-600">
+							Add Another Content <span className="ml-1">+</span>
+						</button>
+					</div>
+				)}
+
+				{!disabled && (
+					<div className="flex justify-between items-center mt-6">
+						<Button type="button" variant="secondary" onClick={onBack} className="px-6 py-3">
+							Cancel
+						</Button>
+						<Button type="submit" variant="dark" className="px-6 py-3">
+							{isEditMode ? 'Update' : 'Add'}
+						</Button>
+					</div>
+				)}
+			</form>
+		</FormikProvider>
+	);
 };
 
 export default CourseContentsForm;
+

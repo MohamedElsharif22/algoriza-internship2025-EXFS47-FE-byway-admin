@@ -23,7 +23,7 @@ const AddCoursePage = () => {
   // courseService.getAllCategories should return an array; be defensive in case it's wrapped
   const catsAny = catsRaw as any;
   const catsArr = Array.isArray(catsAny) ? catsAny : (catsAny?.data ?? []);
-        console.log('Loaded categories', catsArr);
+  // categories loaded
         setCategories(catsArr);
       } catch (e) {
         console.error('Failed loading categories', e);
@@ -37,7 +37,7 @@ const AddCoursePage = () => {
   const respAny = resp as any;
   const dataArr = Array.isArray(respAny) ? respAny : (respAny?.data ?? respAny?.data?.data ?? respAny?.items ?? []);
         const mapped = (dataArr || []).map((i: any) => ({ id: i.id, name: i.name }));
-        console.log('Loaded instructors', mapped);
+  // instructors loaded
         setInstructors(mapped);
       } catch (err) {
         console.error('Failed loading instructors', err);
@@ -73,24 +73,9 @@ const AddCoursePage = () => {
       }
 
       // append contents as JSON string (server accepts JSON string in 'Contents')
-      const normalizedContents = contents.map((c, idx) => ({ contentId: idx + 1, Name: c.name, LecturesNumber: Number(c.lecturesNumber), DurationInHours: Number(c.time) }));
+  const normalizedContents = contents.map((c, idx) => ({ contentId: idx + 1, Name: c.name, LecturesCount: Number(c.lecturesCount), DurationInHours: Number(c.durationInHours) }));
       formData.append('Contents', JSON.stringify(normalizedContents));
 
-      // DEBUG: log all FormData entries so we can verify what will be sent
-      console.group('CreateCourse FormData (before indexed fallback)');
-      for (const pair of (formData as any).entries()) {
-        try {
-          const [k, v] = pair as [string, any];
-          if (v instanceof File) {
-            console.log(k, `File(${v.name}, ${v.type}, ${v.size} bytes)`);
-          } else {
-            console.log(k, v);
-          }
-        } catch (err) {
-          console.log('FormData entry', pair);
-        }
-      }
-      console.groupEnd();
 
     //   // Fallback: also append Contents as indexed fields (some servers prefer this)
     //   normalizedContents.forEach((item, idx) => {
@@ -100,20 +85,7 @@ const AddCoursePage = () => {
     //     formData.append(`Contents[${idx}].DurationInHours`, String(item.DurationInHours));
     //   });
 
-      console.group('CreateCourse FormData (after indexed fallback)');
-      for (const pair of (formData as any).entries()) {
-        try {
-          const [k, v] = pair as [string, any];
-          if (v instanceof File) {
-            console.log(k, `File(${v.name}, ${v.type}, ${v.size} bytes)`);
-          } else {
-            console.log(k, v);
-          }
-        } catch (err) {
-          console.log('FormData entry', pair);
-        }
-      }
-      console.groupEnd();
+      // FormData prepared for submission
 
       await courseService.createCourse(formData);
       toast.success('Course created');
@@ -126,8 +98,8 @@ const AddCoursePage = () => {
 
   return (
     <div className="space-y-4">
-      <div className="bg-white rounded-2xl p-6 shadow-sm">
         <PageHeader title="Add Course" subtitle={<span>Dashboard / Courses / Add Course</span>} />
+      <div className="bg-white rounded-2xl p-6 shadow-sm">
 
         <div className="mt-4">
           <div className="text-sm text-gray-500 mb-4">Step {step} of 2</div>

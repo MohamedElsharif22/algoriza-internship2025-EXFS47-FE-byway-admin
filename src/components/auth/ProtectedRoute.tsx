@@ -13,9 +13,7 @@ const ProtectedRoute = ({ children, requireAdmin = true }: ProtectedRouteProps) 
   // Development helper: allow bypassing auth when running locally to debug UI
   const isDev = import.meta.env.DEV;
   if (isDev) {
-    // Log for visibility when debugging
-    // eslint-disable-next-line no-console
-    console.log('[ProtectedRoute] DEV bypass active — rendering children without auth');
+    // DEV bypass: render children without auth in development
     return <>{children}</>;
   }
 

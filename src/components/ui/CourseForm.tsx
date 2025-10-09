@@ -8,9 +8,10 @@ interface CourseFormProps {
   categories: Category[];
   onSubmit: (formData: FormData) => Promise<void>;
   onCancel: () => void;
+  disabled?: boolean;
 }
 
-const CourseForm = ({ course, categories, onSubmit, onCancel }: CourseFormProps) => {
+const CourseForm = ({ course, categories, onSubmit, onCancel, disabled }: CourseFormProps) => {
   const validationSchema = Yup.object({
     title: Yup.string().required('Title is required'),
     description: Yup.string().required('Description is required'),
@@ -56,6 +57,7 @@ const CourseForm = ({ course, categories, onSubmit, onCancel }: CourseFormProps)
           id="title"
           {...formik.getFieldProps('title')}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+          disabled={!!disabled}
         />
         {formik.touched.title && formik.errors.title && (
           <div className="mt-1 text-sm text-red-600">{formik.errors.title}</div>
@@ -71,6 +73,7 @@ const CourseForm = ({ course, categories, onSubmit, onCancel }: CourseFormProps)
           rows={4}
           {...formik.getFieldProps('description')}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+          disabled={!!disabled}
         />
         {formik.touched.description && formik.errors.description && (
           <div className="mt-1 text-sm text-red-600">{formik.errors.description}</div>
@@ -87,6 +90,7 @@ const CourseForm = ({ course, categories, onSubmit, onCancel }: CourseFormProps)
           id="price"
           {...formik.getFieldProps('price')}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+          disabled={!!disabled}
         />
         {formik.touched.price && formik.errors.price && (
           <div className="mt-1 text-sm text-red-600">{formik.errors.price}</div>
@@ -101,6 +105,7 @@ const CourseForm = ({ course, categories, onSubmit, onCancel }: CourseFormProps)
           id="categoryId"
           {...formik.getFieldProps('categoryId')}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 sm:text-sm"
+          disabled={!!disabled}
         >
           <option value="">Select a category</option>
           {categories.map((category) => (
@@ -127,6 +132,7 @@ const CourseForm = ({ course, categories, onSubmit, onCancel }: CourseFormProps)
             formik.setFieldValue('coverPicture', file);
           }}
           className="mt-1 block w-full"
+          disabled={!!disabled}
         />
         {formik.touched.coverPicture && formik.errors.coverPicture && (
           <div className="mt-1 text-sm text-red-600">
@@ -145,23 +151,25 @@ const CourseForm = ({ course, categories, onSubmit, onCancel }: CourseFormProps)
         )}
       </div>
 
-      <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
-        <Button
-          type="submit"
-          disabled={formik.isSubmitting}
-          className="w-full sm:w-auto sm:ml-3"
-        >
-          {course ? 'Update' : 'Create'}
-        </Button>
-        <Button
-          type="button"
-          variant="secondary"
-          onClick={onCancel}
-          className="mt-3 w-full sm:mt-0 sm:w-auto"
-        >
-          Cancel
-        </Button>
-      </div>
+  {!disabled && (
+        <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+          <Button
+            type="submit"
+            disabled={formik.isSubmitting}
+            className="w-full sm:w-auto sm:ml-3"
+          >
+            {course ? 'Update' : 'Create'}
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={onCancel}
+            className="mt-3 w-full sm:mt-0 sm:w-auto"
+          >
+            Cancel
+          </Button>
+        </div>
+      )}
     </form>
   );
 };

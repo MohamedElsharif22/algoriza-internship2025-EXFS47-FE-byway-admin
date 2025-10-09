@@ -16,6 +16,7 @@ const EditCoursePage = () => {
   const [step, setStep] = useState(1);
   const [categories, setCategories] = useState<Category[]>([]);
   const [instructors, setInstructors] = useState<{ id: number; name: string }[]>([]);
+  const [levels, setLevels] = useState<{ level: string; value: number }[]>([]);
   const [details, setDetails] = useState<any>(null);
 
   useEffect(() => {
@@ -50,6 +51,16 @@ const EditCoursePage = () => {
           return;
         }
         // Map API response to form initial values
+        // helper to map API level string to numeric value expected by the form
+        const mapLevelToValue = (lvl: any) => {
+          if (!lvl && lvl !== 0) return '';
+          const s = String(lvl).toLowerCase();
+          if (s.includes('beginner') || s === '1') return 1;
+          if (s.includes('intermediate') || s === '2') return 2;
+          if (s.includes('advanced') || s === '3') return 3;
+          return '';
+        };
+
         setDetails({
           id: course.id,
           title: course.title,
@@ -62,14 +73,15 @@ const EditCoursePage = () => {
           totalHours: course.durationInHours ?? '',
           rating: course.rating ?? 5,
           lecturesCount: course.lecturesCount ?? 0,
-          courseLevel: course.courseLevel ?? '',
+          // API now returns a 'level' string (e.g. 'Intermediate'), map it to numeric form value
+          courseLevel: mapLevelToValue(course.level ?? course.courseLevel ?? ''),
           coverPicture: null,
           coverPictureUrl: course.coverPictureUrl ?? course.coverPicture,
           existingContents: (course.contents || []).map((c: any) => ({
             id: c.id,
             name: c.name,
-            lecturesNumber: c.lecturesCount,
-            time: c.durationInHours,
+            lecturesCount: c.lecturesCount,
+            durationInHours: c.durationInHours,
           })),
           createdAt: course.createdAt,
           updatedAt: course.updatedAt,
@@ -78,10 +90,22 @@ const EditCoursePage = () => {
         console.error('Failed loading course details', err);
       }
     })();
+
+    (async () => {
+      try {
+        const lv = await courseService.getCourseLevels();
+        setLevels(lv || []);
+      } catch (err) {
+        console.error('Failed loading course levels', err);
+      }
+    })();
   }, [courseId, navigate]);
 
   const handleDetailsNext = (values: any) => {
-    setDetails(values);
+    setDetails((prev: any) => ({
+      ...values,
+      existingContents: prev?.existingContents ?? [{ name: '', lecturesCount: '', durationInHours: '' }]
+    }));
     setStep(2);
   };
 
@@ -108,23 +132,16 @@ const EditCoursePage = () => {
         formData.append('CoverPictureUrl', details.coverPictureUrl);
       }
 
-      const normalizedContents = contents.map((c, idx) => ({ contentId: idx + 1, Name: c.name, LecturesNumber: Number(c.lecturesNumber), DurationInHours: Number(c.time) }));
+  const normalizedContents = contents.map((c, idx) => ({ contentId: idx + 1, Name: c.name, LecturesCount: Number(c.lecturesCount), DurationInHours: Number(c.durationInHours) }));
       formData.append('Contents', JSON.stringify(normalizedContents));
       normalizedContents.forEach((item, idx) => {
         formData.append(`Contents[${idx}].contentId`, String(item.contentId));
         formData.append(`Contents[${idx}].Name`, String(item.Name));
-        formData.append(`Contents[${idx}].LecturesNumber`, String(item.LecturesNumber));
+  formData.append(`Contents[${idx}].LecturesCount`, String(item.LecturesCount));
         formData.append(`Contents[${idx}].DurationInHours`, String(item.DurationInHours));
       });
 
-      // debug
-      console.group('UpdateCourse FormData (EditPage)');
-      for (const pair of (formData as any).entries()) {
-        const [k, v] = pair as [string, any];
-        if (v instanceof File) console.log(k, `File(${v.name})`);
-        else console.log(k, v);
-      }
-      console.groupEnd();
+      // FormData prepared for update
 
       await courseService.updateCourse(courseId, formData);
       toast.success('Course updated');
@@ -149,6 +166,7 @@ const EditCoursePage = () => {
                 initialValues={details}
                 categories={categories}
                 instructors={instructors}
+                levels={levels}
                 onNext={handleDetailsNext}
                 onCancel={() => navigate('/courses')}
               />
@@ -156,7 +174,7 @@ const EditCoursePage = () => {
 
             {step === 2 && (
               <CourseContentsForm
-                initialContents={((details as any).existingContents || []).length ? (details as any).existingContents : [{ name: '', lecturesNumber: '', time: '' }]}
+                initialContents={details?.existingContents ?? [{ name: '', lecturesCount: '', durationInHours: '' }]}
                 onBack={() => setStep(1)}
                 onSubmit={handleSubmitContents}
               />

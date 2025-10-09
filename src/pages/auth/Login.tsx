@@ -26,9 +26,7 @@ const Login = () => {
         throw new Error('Please enter both email and password');
       }
 
-      console.log('Attempting login with:', { email }); // Debug log
       const response = await authService.login({ email, password });
-      console.log('Login successful:', response); // Debug log
 
       setAuth({
         isAuthenticated: true,
@@ -45,7 +43,8 @@ const Login = () => {
       toast.success('Successfully logged in!');
       navigate('/dashboard');
     } catch (err) {
-      console.error('Login error:', err); // Debug log
+      // Log the error for debugging in non-production environments only
+      // console.error('Login error:', err);
       const message = err instanceof Error
         ? err.message
         : 'Login failed. Please check your credentials and try again.';

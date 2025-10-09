@@ -1,0 +1,27 @@
+.course-quill .ql-toolbar.ql-snow {
+  border: none;
+  background: transparent;
+  padding: 0.25rem 0.5rem;
+}
+
+.course-quill .ql-container.ql-snow {
+  border: none;
+  box-shadow: none;
+  background: transparent;
+}
+
+.course-quill .ql-editor {
+  min-height: 160px;
+  padding: 0.5rem;
+  border-radius: 0.5rem; /* match rounded-lg */
+  background: transparent;
+  color: #374151; /* text-gray-700 */
+}
+
+.course-quill .ql-editor p {
+  margin: 0;
+}
+
+.course-quill .ql-editor:focus {
+  outline: none;
+}

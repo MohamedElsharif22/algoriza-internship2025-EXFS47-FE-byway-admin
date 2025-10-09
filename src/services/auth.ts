@@ -33,7 +33,7 @@ class AuthService {
   async login(credentials: LoginCredentials): Promise<LoginResponse> {
     try {
       const response = await axios.post(`${API_URL}/account/login`, credentials);
-      console.log('Login response:', response.data); // For debugging
+  // successful login response
       
       const { token } = response.data;
       if (!token) {
@@ -48,7 +48,6 @@ class AuthService {
         console.error('Token decode error:', decodeError);
         throw new Error('Invalid token format');
       }
-      console.log('Decoded token:', decoded); // For debugging
 
       // Check if the token contains role information from several possible claim keys
       const roleClaim = decoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ||
@@ -62,7 +61,7 @@ class AuthService {
         : typeof roleClaim === 'string' ? [roleClaim]
         : [];
 
-      console.log('Roles found:', roles); // For debugging
+  // roles parsed from token
 
       // Case-insensitive check for admin role
       const hasAdmin = roles.some((r) => String(r).toLowerCase() === 'admin');
@@ -163,33 +162,3 @@ class AuthService {
 }
 
 export const authService = new AuthService();
-
-// Temporary debug helper - remove or comment out in production
-if (import.meta.env.DEV) {
-  (async () => {
-    try {
-      // Example decoded payload (shape we logged earlier)
-      const sampleDecoded: any = {
-        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier": "5f0e700b-f4dd-4c62-9eab-930c08c4de02",
-        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress": "admin@byway.com",
-        "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name": "admin_Muhammad",
-        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role": "Admin",
-        exp: 1760734587,
-        iss: "https://localhost:7228",
-        aud: "MySecuredAPIsUsers"
-      };
-
-      const roleClaim = sampleDecoded['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ||
-                        sampleDecoded['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/role'] ||
-                        sampleDecoded.role ||
-                        sampleDecoded.roles ||
-                        [];
-      const roles = Array.isArray(roleClaim) ? roleClaim : typeof roleClaim === 'string' ? [roleClaim] : [];
-      console.log('DEBUG roles from sampleDecoded:', roles);
-      const hasAdmin = roles.some((r: any) => String(r).toLowerCase() === 'admin');
-      console.log('DEBUG hasAdmin:', hasAdmin);
-    } catch (e) {
-      console.error('DEBUG token test error', e);
-    }
-  })();
-}
