@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const BASE_URL = 'https://localhost:7228/api';
+// Prefer Vite environment variable, fallback to the known remote API URL.
+const BASE_URL = import.meta.env.VITE_API_URL || 'https://kamalalgointern-001-site1.qtempurl.com/api';
 
 const api = axios.create({
   baseURL: BASE_URL,
@@ -25,10 +26,10 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
+    // Remove only the token on 401, do not redirect to login here.
     if (error.response?.status === 401) {
-      // Handle unauthorized access
       localStorage.removeItem('token');
-      window.location.href = '/login';
+      // No redirect to /login here
     }
     return Promise.reject(error);
   }
