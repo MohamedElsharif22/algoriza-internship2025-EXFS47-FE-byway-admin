@@ -1,8 +1,10 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import Layout from './components/layout/Layout';
 import 'react-toastify/dist/ReactToastify.css';
+import { useEffect } from 'react';
+import { authService } from './services/auth.service';
 
 // Import pages
 import Login from './pages/auth/Login';
@@ -16,8 +18,27 @@ import ViewCourse from './pages/ViewCourse';
 import NotFound from './pages/NotFound';
 
 function App() {
+  const RouteGuard = () => {
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+      if (import.meta.env.DEV) return;
+
+      const publicPaths = ['/login', '/unauthorized'];
+      if (publicPaths.includes(location.pathname)) return;
+
+      if (!authService.isAuthenticated()) {
+        navigate('/login', { state: { from: location }, replace: true });
+      }
+    }, [location.pathname, navigate]);
+
+    return null;
+  };
+
   return (
     <Router>
+      <RouteGuard />
       <div className="min-h-screen bg-gray-50">
         <Routes>
           {/* Public routes */}

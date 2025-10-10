@@ -25,7 +25,7 @@ const UnauthorizedPage = () => {
             Go to Dashboard
           </Button>
           <Button
-            onClick={() => navigate('/login')}
+            onClick={() => navigate('/login', { replace: true })}
             variant="secondary"
             className="w-full"
           >

@@ -53,13 +53,13 @@ const Sidebar = () => {
         <div className="mt-6 border-t pt-6">
           <button
             className="flex items-center gap-3 text-slate-500 text-base lowercase"
-            onClick={() => {
+              onClick={() => {
               try {
                 localStorage.removeItem('token');
               } catch (e) {
                 // ignore
               }
-              navigate('/login');
+              navigate('/login', { replace: true });
             }}
           >
             <ArrowLeftOnRectangleIcon className="w-5 h-5" />
@@ -92,9 +92,9 @@ const Sidebar = () => {
             {/* Logout as a button on mobile */}
             <button
               onClick={() => {
-                try { localStorage.removeItem('token'); } catch (e) {}
-                navigate('/login');
-              }}
+                  try { localStorage.removeItem('token'); } catch (e) {}
+                  navigate('/login', { replace: true });
+                }}
               className="flex-1 flex flex-col items-center justify-center text-xs text-slate-600 py-2"
             >
               <ArrowLeftOnRectangleIcon className="w-5 h-5" />
