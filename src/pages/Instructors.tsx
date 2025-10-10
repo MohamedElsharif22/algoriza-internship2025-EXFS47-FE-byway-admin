@@ -99,27 +99,26 @@ const InstructorsPage = () => {
 
       <div className="px-6">
       {/* Card with table and controls */}
-      <div className="bg-white rounded-2xl shadow p-8">
-        <div className="flex items-center justify-between mb-6">
+      <div className="bg-white rounded-2xl shadow p-8 overflow-hidden">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">
           <div className="flex items-center gap-4">
             <h2 className="text-2xl font-semibold text-slate-800">Instructors</h2>
             <span className="bg-slate-100 text-slate-500 text-base font-semibold px-3 py-1 rounded-full">{instructors.count ?? instructors.data?.length ?? 0}</span>
           </div>
-          <div className="flex items-center gap-3">
-            <Button className="bg-slate-900 text-white px-6 py-2 rounded-lg font-semibold text-base shadow" onClick={() => setIsAddDialogOpen(true)}>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 w-full md:w-auto">
+            <Button className="bg-slate-900 text-white px-6 py-2 rounded-lg font-semibold text-base shadow w-full sm:w-auto" onClick={() => setIsAddDialogOpen(true)}>
               Add Instructor
             </Button>
-            <div className="relative">
+            <div className="relative w-full sm:w-auto">
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
               <input
                 type="text"
                 placeholder="Search for Instructors"
                 value={filters.search || ''}
                 onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-                className="pl-10 pr-10 py-2 rounded-lg border border-slate-200 text-base focus:ring-2 focus:ring-blue-100 focus:border-blue-300"
-                style={{ width: 220 }}
+                className="pl-10 pr-10 py-2 rounded-lg border border-slate-200 text-base focus:ring-2 focus:ring-blue-100 focus:border-blue-300 w-full sm:w-56"
               />
-              <button className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
+              <button aria-label="Open filters" title="Filter" className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400">
                 <FunnelIcon className="w-5 h-5" />
               </button>
             </div>
@@ -247,13 +246,13 @@ const InstructorsPage = () => {
               </div>
 
               <div className="flex-1">
-                <label className="block text-sm font-medium text-slate-600">Nama</label>
-                <input type="text" value={selectedInstructor.name} readOnly className="mt-2 block w-full rounded-lg border border-slate-100 px-4 py-3 bg-white placeholder-slate-300" />
+                <label htmlFor="view-name" className="block text-sm font-medium text-slate-600">Nama</label>
+                <input id="view-name" type="text" value={selectedInstructor.name} readOnly className="mt-2 block w-full rounded-lg border border-slate-100 px-4 py-3 bg-white placeholder-slate-300" />
 
                 <div className="mt-4 grid grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-sm font-medium text-slate-600">Job Title</label>
-                    <select value={(selectedInstructor as any).jopTitle ?? (selectedInstructor as any).jobTitle} disabled className="mt-2 block w-full rounded-lg border border-slate-100 px-4 py-3 bg-white text-slate-700">
+                    <label htmlFor="view-jobtitle" className="block text-sm font-medium text-slate-600">Job Title</label>
+                    <select id="view-jobtitle" value={(selectedInstructor as any).jopTitle ?? (selectedInstructor as any).jobTitle} disabled className="mt-2 block w-full rounded-lg border border-slate-100 px-4 py-3 bg-white text-slate-700">
                       <option>{(selectedInstructor as any).jopTitle ?? (selectedInstructor as any).jobTitle}</option>
                     </select>
                   </div>
@@ -268,8 +267,8 @@ const InstructorsPage = () => {
                 </div>
 
                 <div className="mt-4">
-                  <label className="block text-sm font-medium text-slate-600">Description</label>
-                  <textarea readOnly value={(selectedInstructor as any).about} className="mt-2 block w-full rounded-lg border border-slate-100 px-4 py-3 h-28 bg-white placeholder-slate-300"></textarea>
+                  <label htmlFor="view-description" className="block text-sm font-medium text-slate-600">Description</label>
+                  <textarea id="view-description" readOnly value={(selectedInstructor as any).about} className="mt-2 block w-full rounded-lg border border-slate-100 px-4 py-3 h-28 bg-white placeholder-slate-300" />
                 </div>
 
                 <div className="mt-6">
