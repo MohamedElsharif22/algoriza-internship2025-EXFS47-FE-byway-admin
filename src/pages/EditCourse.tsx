@@ -122,7 +122,8 @@ const EditCoursePage = () => {
       formData.append('Description', details.description);
       formData.append('Rating', String(details.rating ?? 5));
       formData.append('Price', String(details.price ?? 0));
-      formData.append('CousrseLevel', String(details.courseLevel ?? 1));
+  // Correct key name expected by API
+  formData.append('CourseLevel', String(details.courseLevel ?? 1));
       formData.append('InstructorId', String(details.instructorId));
       formData.append('CategoryId', String(details.categoryId));
       if (details.coverPicture && details.coverPicture instanceof File) {
@@ -141,11 +142,31 @@ const EditCoursePage = () => {
         formData.append(`Contents[${idx}].DurationInHours`, String(item.DurationInHours));
       });
 
-      // FormData prepared for update
+      // Debug: log FormData entries (for dev only)
+      try {
+        const fdObj: Record<string, any> = {};
+        formData.forEach((value, key) => {
+          // If multiple values exist for a key, convert to array
+          if (fdObj[key]) {
+            if (!Array.isArray(fdObj[key])) fdObj[key] = [fdObj[key]];
+            fdObj[key].push(value);
+          } else {
+            fdObj[key] = value;
+          }
+        });
+        console.debug('Submitting updateCourse FormData:', fdObj);
+      } catch (err) {
+        console.debug('Unable to serialize FormData for debug', err);
+      }
 
-      await courseService.updateCourse(courseId, formData);
-      toast.success('Course updated');
-      navigate('/courses');
+      try {
+        await courseService.updateCourse(courseId, formData);
+        toast.success('Course updated');
+        navigate('/courses');
+      } catch (err: any) {
+        console.error('Update course failed:', err, err?.response?.data ?? err?.message);
+        toast.error(err?.response?.data?.message || 'Failed to update course');
+      }
     } catch (e) {
       console.error(e);
       toast.error('Failed to update course');

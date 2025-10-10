@@ -1,8 +1,7 @@
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
 import { AuthUtils } from '../utils/auth.utils';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+import api from './api.config';
 
 export interface LoginCredentials {
   email: string;
@@ -25,15 +24,16 @@ class AuthService {
 
   constructor() {
     // Load token from localStorage on initialization
-    this.token = localStorage.getItem('token');
+    this.token = AuthUtils.getToken();
     if (this.token) {
+      try { (api as any).defaults.headers.common['Authorization'] = `Bearer ${this.token}`; } catch (e) {}
       axios.defaults.headers.common['Authorization'] = `Bearer ${this.token}`;
     }
   }
 
   async login(credentials: LoginCredentials): Promise<LoginResponse> {
     try {
-      const response = await axios.post(`${API_URL}/account/login`, credentials);
+  const response = await api.post(`/account/login`, credentials);
   // successful login response
       
       const { token } = response.data;
@@ -71,12 +71,10 @@ class AuthService {
       }
 
       // Store token in localStorage
-      localStorage.setItem('token', token);
-      
-      // Set default Authorization header for all requests
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      
-      this.token = token;
+  AuthUtils.setToken(token);
+  try { (api as any).defaults.headers.common['Authorization'] = `Bearer ${token}`; } catch (e) {}
+  axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  this.token = token;
       
       // Extract name and email from response or token claims
       const name = response.data.name || '';
@@ -93,7 +91,8 @@ class AuthService {
 
   logout(): void {
     AuthUtils.removeToken();
-    delete axios.defaults.headers.common['Authorization'];
+    try { delete (api as any).defaults.headers.common['Authorization']; } catch (e) {}
+    try { delete axios.defaults.headers.common['Authorization']; } catch (e) {}
     this.token = null;
   }
 

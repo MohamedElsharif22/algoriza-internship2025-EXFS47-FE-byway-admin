@@ -1,5 +1,5 @@
 import axios from 'axios';
-// import { AuthUtils } from '../utils/auth.utils';
+import { AuthUtils } from '../utils/auth.utils';
 
 // Prefer Vite environment variable, fallback to the known remote API URL.
 const BASE_URL = import.meta.env.VITE_API_URL || 'https://kamalalgointern-001-site1.qtempurl.com/api';
@@ -12,9 +12,14 @@ const api = axios.create({
 // Request interceptor for adding auth token
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = AuthUtils.getToken();
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+      config.headers = config.headers || {};
+      (config.headers as any).Authorization = `Bearer ${token}`;
+      if (import.meta.env.DEV) {
+        // eslint-disable-next-line no-console
+        console.debug('[api] attaching token to request', { url: config.url, hasToken: !!token });
+      }
     }
     return config;
   },

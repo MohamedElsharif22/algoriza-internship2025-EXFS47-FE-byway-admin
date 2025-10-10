@@ -6,7 +6,8 @@ export const authService = {
   login: async (data: LoginRequest): Promise<ApiResponse<LoginResponse>> => {
     const response = await api.post<ApiResponse<LoginResponse>>('/account/login', data);
     if (response.data.data.token) {
-      localStorage.setItem('token', response.data.data.token);
+      AuthUtils.setToken(response.data.data.token);
+      try { (api as any).defaults.headers.common['Authorization'] = `Bearer ${response.data.data.token}`; } catch (e) {}
     }
     return response.data;
   },
@@ -14,7 +15,8 @@ export const authService = {
   register: async (data: RegisterRequest): Promise<ApiResponse<LoginResponse>> => {
     const response = await api.post<ApiResponse<LoginResponse>>('/account/register', data);
     if (response.data.data.token) {
-      localStorage.setItem('token', response.data.data.token);
+      AuthUtils.setToken(response.data.data.token);
+      try { (api as any).defaults.headers.common['Authorization'] = `Bearer ${response.data.data.token}`; } catch (e) {}
     }
     return response.data;
   },

@@ -73,7 +73,10 @@ const InstructorForm = ({ instructor, onSubmit, onCancel }: InstructorFormProps)
         return normalize(jt.title) === normalize(instructorTitleRaw);
       });
       if (match) {
-        formik.setFieldValue('jobTitle', match.value ?? match.id);
+        const val = match.value ?? match.id;
+        if (typeof val !== 'undefined' && val !== null) {
+          formik.setFieldValue('jobTitle', Number(val));
+        }
       }
     }
   }, [instructor, jobTitles]);
@@ -90,7 +93,7 @@ const InstructorForm = ({ instructor, onSubmit, onCancel }: InstructorFormProps)
               <PhotoIcon className="w-10 h-10 text-slate-400" />
             )}
           </div>
-          <label htmlFor="profilePicture" className="absolute bottom-0 right-0 bg-white rounded-full shadow p-2 cursor-pointer">
+          <label htmlFor="profilePicture" aria-label="Upload profile picture" title="Upload profile picture" className="absolute bottom-0 right-0 bg-white rounded-full shadow p-2 cursor-pointer">
             <CameraIcon className="w-6 h-6 text-blue-600" />
             <input
               type="file"
@@ -131,14 +134,13 @@ const InstructorForm = ({ instructor, onSubmit, onCancel }: InstructorFormProps)
           <select
             id="jobTitle"
             name="jobTitle"
-            value={formik.values.jobTitle}
+            value={String(formik.values.jobTitle ?? '')}
             onChange={e => formik.setFieldValue('jobTitle', Number(e.target.value))}
-            className="block w-full rounded-lg border border-slate-200 px-4 py-3 text-base text-slate-700 bg-white focus:ring-2 focus:ring-blue-100 focus:border-blue-300 appearance-none"
-            style={{ minHeight: '48px' }}
+            className="block w-full rounded-lg border border-slate-200 px-4 py-3 text-base text-slate-700 bg-white focus:ring-2 focus:ring-blue-100 focus:border-blue-300 appearance-none h-12"
           >
             <option value="" className="text-slate-400">Choose</option>
             {jobTitles.map((title) => (
-              <option key={title.value ?? title.id} value={title.value ?? title.id} className="text-slate-700 bg-white">{title.title}</option>
+              <option key={String(title.value ?? title.id)} value={String(title.value ?? title.id)} className="text-slate-700 bg-white">{title.title}</option>
             ))}
           </select>
           {formik.touched.jobTitle && formik.errors.jobTitle && (
@@ -153,6 +155,8 @@ const InstructorForm = ({ instructor, onSubmit, onCancel }: InstructorFormProps)
                 key={star}
                 type="button"
                 className="focus:outline-none"
+                title={`Set rating ${star}`}
+                aria-label={`Set rating ${star}`}
                 onClick={() => formik.setFieldValue('rating', star)}
               >
                 <StarIcon className={

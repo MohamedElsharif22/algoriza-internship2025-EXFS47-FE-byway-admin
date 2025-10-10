@@ -62,8 +62,8 @@ const AddCoursePage = () => {
       formData.append('Title', details.title);
       formData.append('Description', details.description);
       formData.append('Rating', String(details.rating ?? 5));
-      formData.append('Price', String(details.price ?? 0));
-      formData.append('CousrseLevel', String(details.courseLevel ?? 1));
+  formData.append('Price', String(details.price ?? 0));
+  formData.append('CourseLevel', String(details.courseLevel ?? 1));
       formData.append('InstructorId', String(details.instructorId));
       formData.append('CategoryId', String(details.categoryId));
       if (details.coverPicture && details.coverPicture instanceof File) {
@@ -86,6 +86,20 @@ const AddCoursePage = () => {
     //   });
 
       // FormData prepared for submission
+      // Debug: serialize FormData to an object for easier inspection in console
+      try {
+        const fdObj: Record<string, any> = {};
+        formData.forEach((value, key) => {
+          // For File objects, log the name to keep the output readable
+          if (value instanceof File) fdObj[key] = (value as File).name;
+          else fdObj[key] = value;
+        });
+        // eslint-disable-next-line no-console
+        console.debug('CreateCourse FormData:', fdObj);
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.warn('Failed serializing FormData for debug', err);
+      }
 
       await courseService.createCourse(formData);
       toast.success('Course created');

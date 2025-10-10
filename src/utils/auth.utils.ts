@@ -21,6 +21,18 @@ export class AuthUtils {
     localStorage.removeItem('token');
   }
 
+  static getRefreshToken(): string | null {
+    return localStorage.getItem('refreshToken');
+  }
+
+  static setRefreshToken(token: string): void {
+    localStorage.setItem('refreshToken', token);
+  }
+
+  static removeRefreshToken(): void {
+    localStorage.removeItem('refreshToken');
+  }
+
   static isAuthenticated(): boolean {
     const token = this.getToken();
     if (!token) return false;
