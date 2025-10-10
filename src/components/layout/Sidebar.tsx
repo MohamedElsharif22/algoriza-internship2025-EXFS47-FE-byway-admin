@@ -1,4 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { authService } from '../../services/auth.service';
 import logo from '../../assets/logo.png';
 import { 
   HomeIcon, 
@@ -55,7 +56,7 @@ const Sidebar = () => {
             className="flex items-center gap-3 text-slate-500 text-base lowercase"
               onClick={() => {
               try {
-                localStorage.removeItem('token');
+                authService.logout();
               } catch (e) {
                 // ignore
               }
@@ -92,7 +93,7 @@ const Sidebar = () => {
             {/* Logout as a button on mobile */}
             <button
               onClick={() => {
-                  try { localStorage.removeItem('token'); } catch (e) {}
+                  try { authService.logout(); } catch (e) {}
                   navigate('/login', { replace: true });
                 }}
               className="flex-1 flex flex-col items-center justify-center text-xs text-slate-600 py-2"

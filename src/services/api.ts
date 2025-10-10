@@ -45,8 +45,8 @@ api.interceptors.response.use(
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         return api(originalRequest);
       } catch (error) {
-        // If refresh token fails, redirect to login
-        window.location.href = '/login';
+        // If refresh token fails, do not redirect or clear tokens here.
+        // Let the application decide (logout button or other flow) when to remove tokens.
         return Promise.reject(error);
       }
     }

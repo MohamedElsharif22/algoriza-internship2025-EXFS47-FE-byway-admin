@@ -19,8 +19,9 @@ export const authService = {
     return response.data;
   },
 
-  logout: () => {
-    localStorage.removeItem('token');
+    logout: () => {
+      AuthUtils.removeToken();
+    try { delete (api as any).defaults.headers.common['Authorization']; } catch (e) {}
   },
 
   getToken: () => {

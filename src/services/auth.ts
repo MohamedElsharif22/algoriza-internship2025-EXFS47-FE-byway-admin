@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
+import { AuthUtils } from '../utils/auth.utils';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
@@ -91,7 +92,7 @@ class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem('token');
+    AuthUtils.removeToken();
     delete axios.defaults.headers.common['Authorization'];
     this.token = null;
   }
@@ -104,7 +105,7 @@ class AuthService {
       
       // Check for token expiration
       if (decoded.exp && decoded.exp * 1000 <= Date.now()) {
-        this.logout(); // Clear expired token
+        // Do not remove the token automatically; leave it until explicit logout or replacement.
         return false;
       }
       
