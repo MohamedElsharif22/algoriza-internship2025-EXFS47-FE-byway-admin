@@ -280,7 +280,7 @@ const CoursesPage = () => {
               </div>
             ) : (
               (courses.data || []).map((course) => (
-                <div key={course.id} className="rounded-2xl overflow-hidden bg-white shadow-sm border border-gray-100 flex flex-col justify-between h-full">
+                <div key={course.id} className="rounded-2xl overflow-hidden bg-white border border-gray-100  shadow-gray-200 shadow-sm flex flex-col justify-between h-full">
                   <div className="relative rounded-lg overflow-hidden ove p-3">
                     <img src={course.coverPictureUrl ?? course.coverPicture} alt={course.title} className="w-full h-44 object-cover rounded-lg shadow-sm" />
                     <span className="absolute top-5 left-5 bg-white/95 text-xs px-3 py-1 rounded-full font-medium text-primary-600 shadow">
