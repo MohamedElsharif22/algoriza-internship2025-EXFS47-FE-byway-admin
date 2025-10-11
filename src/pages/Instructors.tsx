@@ -103,7 +103,7 @@ const InstructorsPage = () => {
       {loading && <LoadingBanner message="Loading instructors..." />}
       <PageHeader title="Instructors" subtitle={<><span className="text-slate-500">Dashboard</span> <span className="mx-1">/</span> <span>Instructors</span></>} />
 
-      <div className="px-6">
+      <div className="lg:px-6 md:px-4 sm: px-1">
       {/* Card with table and controls */}
       <div className="bg-white rounded-2xl shadow p-8 overflow-hidden">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-4">

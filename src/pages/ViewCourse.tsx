@@ -127,13 +127,13 @@ const ViewCoursePage = () => {
                 <div className="flex gap-4 mt-6">
                   <button
                     onClick={() => navigate('/courses')}
-                    className="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+                    className="px-4 py-2 bg-red-50 border border-red-200 text-red-500 rounded-lg hover:bg-gray-50"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={() => setStep(2)}
-                    className="flex-1 px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800"
+                    className="flex-1 bg-slate-900 text-white px-6 py-2 rounded-lg font-semibold text-base shadow w-full sm:w-auto hover:bg-cyan-900"
                   >
                     Next
                   </button>
@@ -148,6 +148,7 @@ const ViewCoursePage = () => {
                 onSubmit={() => { }}
                 disabled={true}
               />
+              
             )}
           </div>
         </div>
