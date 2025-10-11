@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import LoadingBanner from '../components/ui/LoadingBanner';
 import PageHeader from '../components/layout/PageHeader';
 import CourseDetailsForm from '../components/ui/CourseDetailsForm';
 import CourseContentsForm from '../components/ui/CourseContentsForm';
@@ -14,12 +15,14 @@ const EditCoursePage = () => {
   const navigate = useNavigate();
 
   const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [instructors, setInstructors] = useState<{ id: number; name: string }[]>([]);
   const [levels, setLevels] = useState<{ level: string; value: number }[]>([]);
   const [details, setDetails] = useState<any>(null);
 
   useEffect(() => {
+    setLoading(true);
     (async () => {
       try {
         const catsRaw = await courseService.getAllCategories();
@@ -175,6 +178,7 @@ const EditCoursePage = () => {
 
   return (
     <div className="space-y-4">
+      {loading && <LoadingBanner message="Loading course data..." />}
       <div className="bg-white rounded-2xl p-6 shadow-sm">
         <PageHeader title="Edit Course" subtitle={<span>Dashboard / Courses / Edit Course</span>} />
 

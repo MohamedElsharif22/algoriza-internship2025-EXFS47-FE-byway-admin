@@ -6,6 +6,7 @@ import Button from './Button';
 import { StarIcon, CameraIcon, PhotoIcon } from '@heroicons/react/24/outline';
 import { instructorService } from '../../services/instructor.service';
 import { Instructor, JobTitle } from '../../types/api.types';
+import LoadingBanner from './LoadingBanner';
 
 interface InstructorFormProps {
   instructor?: Instructor;
@@ -16,9 +17,12 @@ interface InstructorFormProps {
 
 const InstructorForm = ({ instructor, onSubmit, onCancel, readOnly = false }: InstructorFormProps) => {
   const [jobTitles, setJobTitles] = useState<JobTitle[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingJobTitles, setIsLoadingJobTitles] = useState(false);
 
   useEffect(() => {
     const loadJobTitles = async () => {
+      setIsLoadingJobTitles(true);
       try {
         const response = await instructorService.getAllJobTitles();
         // API returns either array or { data: array }
@@ -29,6 +33,8 @@ const InstructorForm = ({ instructor, onSubmit, onCancel, readOnly = false }: In
         }
       } catch (error) {
         console.error('Error loading job titles:', error);
+      } finally {
+        setIsLoadingJobTitles(false);
       }
     };
     loadJobTitles();
@@ -51,14 +57,19 @@ const InstructorForm = ({ instructor, onSubmit, onCancel, readOnly = false }: In
       // rating is not required by API
     }),
     onSubmit: async (values) => {
-      const formData = new FormData();
-      formData.append('Name', values.name);
-      formData.append('JopTitle', String(values.jobTitle));
-      formData.append('About', values.about);
-      if (values.profilePicture) {
-        formData.append('ProfilePicture', values.profilePicture);
+      setIsLoading(true);
+      try {
+        const formData = new FormData();
+        formData.append('Name', values.name);
+        formData.append('JopTitle', String(values.jobTitle));
+        formData.append('About', values.about);
+        if (values.profilePicture) {
+          formData.append('ProfilePicture', values.profilePicture);
+        }
+        await onSubmit(formData);
+      } finally {
+        setIsLoading(false);
       }
-      await onSubmit(formData);
     },
   });
 
@@ -83,6 +94,9 @@ const InstructorForm = ({ instructor, onSubmit, onCancel, readOnly = false }: In
 
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-6">
+      {(isLoading || isLoadingJobTitles) && (
+        <LoadingBanner message={isLoading ? 'Saving changes...' : 'Loading job titles...'} />
+      )}
       {/* Image upload circle */}
       <div className="flex justify-center mt-4">
         <div className="relative w-24 h-24">

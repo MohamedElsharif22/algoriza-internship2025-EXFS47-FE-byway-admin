@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { PhotoIcon } from '@heroicons/react/24/outline';
+import LoadingBanner from './LoadingBanner';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import './course-quill.css';
@@ -35,7 +36,7 @@ interface Props {
 }
 
 const CourseDetailsForm: React.FC<Props> = ({ initialValues = {}, categories, instructors, levels = [], onNext, onCancel, disabled = false }) => {
-  // (no local instructor search state needed currently)
+  const [isLoading, setIsLoading] = useState(false);
 
   const validationSchema = Yup.object().shape({
     title: Yup.string().required('Title is required').max(200),
@@ -66,7 +67,14 @@ const CourseDetailsForm: React.FC<Props> = ({ initialValues = {}, categories, in
       coverPictureUrl: initialValues.coverPictureUrl ?? undefined,
     },
     validationSchema,
-    onSubmit: (values) => onNext?.(values as CourseDetailsValues),
+    onSubmit: async (values) => {
+      setIsLoading(true);
+      try {
+        await onNext?.(values as CourseDetailsValues);
+      } finally {
+        setIsLoading(false);
+      }
+    },
   });
 
   // keep previewUrl in sync with selected file
@@ -79,6 +87,7 @@ const CourseDetailsForm: React.FC<Props> = ({ initialValues = {}, categories, in
 
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-6">
+      {isLoading && <LoadingBanner message="Saving course details..." />}
       <h3 className="text-xl font-semibold text-gray-900">Course details</h3>
 
       <div className="border border-gray-200 rounded-lg p-4 sm:p-6">

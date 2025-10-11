@@ -19,14 +19,13 @@ import { instructorsAtom, instructorFiltersAtom, selectedInstructorAtom, instruc
 import { instructorService } from '../services/instructor.service';
 // types imported where needed in other modules
 import { toast } from 'react-toastify';
+import LoadingBanner from '../components/ui/LoadingBanner';
 
 const InstructorsPage = () => {
   const [instructors, setInstructors] = useAtom(instructorsAtom);
   const [filters, setFilters] = useAtom(instructorFiltersAtom);
   const [selectedInstructor, setSelectedInstructor] = useAtom(selectedInstructorAtom);
-  // Undo editInstructorData state
-  // loading state is available in the store but not used in this page's current markup
-  const [, setLoading] = useAtom(instructorLoadingAtom);
+  const [loading, setLoading] = useAtom(instructorLoadingAtom);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
@@ -95,6 +94,7 @@ const InstructorsPage = () => {
 
   return (
     <div>
+      {loading && <LoadingBanner message="Loading instructors..." />}
       <PageHeader title="Instructors" subtitle={<><span className="text-slate-500">Dashboard</span> <span className="mx-1">/</span> <span>Instructors</span></>} />
 
       <div className="px-6">

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import PageHeader from '../components/layout/PageHeader';
+import LoadingBanner from '../components/ui/LoadingBanner';
 import CourseDetailsForm from '../components/ui/CourseDetailsForm';
 import CourseContentsForm from '../components/ui/CourseContentsForm';
 import { courseService } from '../services/course.service';
@@ -12,11 +13,13 @@ const ViewCoursePage = () => {
   const navigate = useNavigate();
 
   const [step, setStep] = useState<number>(1);
+  const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [instructors, setInstructors] = useState<{ id: number; name: string }[]>([]);
   const [details, setDetails] = useState<any>(null);
 
   useEffect(() => {
+    setLoading(true);
     (async () => {
       try {
         const catsRaw = await courseService.getAllCategories();
@@ -74,49 +77,51 @@ const ViewCoursePage = () => {
         // ignore
       }
     })();
+    setLoading(false);
   }, [courseId, navigate]);
 
   return (
     <div className="space-y-4">
-      <div className="bg-white rounded-2xl p-6 shadow-sm">
-        <PageHeader title="View Course" subtitle={<span>Dashboard / Courses / View Course</span>} />
-        <div className="mt-4">
-          <div className="text-sm text-gray-500 mb-4">Step {step} of 2</div>
-          <div className="flex justify-end mb-3">
-            {step === 1 ? (
-              <button className="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-gray-200" onClick={() => setStep(2)}>
-                View Contents →
-              </button>
-            ) : (
-              <button className="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-gray-200" onClick={() => setStep(1)}>
-                ← Back to Details
-              </button>
-            )}
-          </div>
+      {loading && <LoadingBanner message="Loading course details..." /> >
+        <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <PageHeader title="View Course" subtitle={<span>Dashboard / Courses / View Course</span>} />
+          <div className="mt-4">
+            <div className="text-sm text-gray-500 mb-4">Step {step} of 2</div>
+            <div className="flex justify-end mb-3">
+              {step === 1 ? (
+                <button className="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-gray-200" onClick={() => setStep(2)}>
+                  View Contents →
+                </button>
+              ) : (
+                <button className="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-gray-200" onClick={() => setStep(1)}>
+                  ← Back to Details
+                </button>
+              )}
+            </div>
 
-          <div className="bg-white rounded-lg p-6">
-            {details && step === 1 && (
-              <CourseDetailsForm
-                initialValues={details}
-                categories={categories}
-                instructors={instructors}
-                onCancel={() => navigate('/courses')}
-                disabled={true}
-              />
-            )}
+            <div className="bg-white rounded-lg p-6">
+              {details && step === 1 && (
+                <CourseDetailsForm
+                  initialValues={details}
+                  categories={categories}
+                  instructors={instructors}
+                  onCancel={() => navigate('/courses')}
+                  disabled={true}
+                />
+              )}
 
-            {details && step === 2 && (
-              <CourseContentsForm
-                initialContents={details.existingContents ?? []}
-                onBack={() => setStep(1)}
-                onSubmit={() => {}}
-                disabled={true}
-              />
-            )}
+              {details && step === 2 && (
+                <CourseContentsForm
+                  initialContents={details.existingContents ?? []}
+                  onBack={() => setStep(1)}
+                  onSubmit={() => { }}
+                  disabled={true}
+                />
+              )}
+            </div>
           </div>
         </div>
-      </div>
-    </div>
+      }</div>
   );
 };
 

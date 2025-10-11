@@ -16,6 +16,7 @@ import {
 } from 'recharts';
 import { dashboardStatsAtom, dashboardLoadingAtom } from '../store/dashboard.store';
 import { dashboardService } from '../services/dashboard.service';
+import LoadingBanner from '../components/ui/LoadingBanner';
 
 const getStatsData = (stats: any) => [
   {
@@ -107,9 +108,12 @@ const Dashboard = () => {
 
   if (loading || !stats) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-      </div>
+      <>
+        <LoadingBanner message="Loading dashboard data..." />
+        <div className="flex items-center justify-center h-full">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+        </div>
+      </>
     );
   }
 

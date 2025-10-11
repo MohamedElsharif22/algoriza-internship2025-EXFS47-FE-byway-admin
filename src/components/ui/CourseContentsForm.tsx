@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useFormik, FormikProvider } from 'formik';
 import * as Yup from 'yup';
+import LoadingBanner from './LoadingBanner';
 import Button from './Button';
 import { TrashIcon } from '@heroicons/react/24/outline';
 
@@ -88,6 +89,7 @@ const CourseContentsForm: React.FC<Props> = ({
 	onSubmit,
 	disabled = false,
 }) => {
+  const [isLoading, setIsLoading] = useState(false);
 	const validationSchema = Yup.object({
 		contents: Yup.array().of(
 			Yup.object({
@@ -109,12 +111,20 @@ const CourseContentsForm: React.FC<Props> = ({
 	const formik = useFormik({
 		initialValues: { contents: normalizedInitialContents },
 		validationSchema,
-		onSubmit: (values) => onSubmit(values.contents),
+		onSubmit: async (values) => {
+			setIsLoading(true);
+			try {
+				await onSubmit(values.contents);
+			} finally {
+				setIsLoading(false);
+			}
+		},
 	});
 
 	return (
 		<FormikProvider value={formik}>
 			<form onSubmit={formik.handleSubmit} className="space-y-4">
+				{isLoading && <LoadingBanner message="Saving course contents..." />}
 				<div className="flex items-center justify-between">
 					<div>
 						{!disabled && (

@@ -23,6 +23,7 @@ import { courseService } from '../services/course.service';
 import { toast } from 'react-toastify';
 import DeleteConfirmation from '../components/ui/DeleteConfirmation';
 import Pagination from '../components/ui/Pagination';
+import LoadingBanner from '../components/ui/LoadingBanner';
 
 const CoursesPage = () => {
   const [courses, setCourses] = useAtom(coursesAtom);
@@ -145,6 +146,7 @@ const CoursesPage = () => {
 
   return (
     <div className="space-y-4">
+        {loading && <LoadingBanner message="Loading courses..." />}
         <PageHeader
           title="Courses"
           subtitle={
@@ -278,7 +280,7 @@ const CoursesPage = () => {
               </div>
             ) : (
               (courses.data || []).map((course) => (
-                <div key={course.id} className="rounded-2xl overflow-hidden bg-white shadow-sm border border-gray-100">
+                <div key={course.id} className="rounded-2xl overflow-hidden bg-white shadow-sm border border-gray-100 flex flex-col justify-between h-full">
                   <div className="relative">
                     <img src={course.coverPictureUrl ?? course.coverPicture} alt={course.title} className="w-full h-44 object-cover" />
                     <span className="absolute top-3 left-3 bg-white/95 text-xs px-3 py-1 rounded-full font-medium text-primary-600 shadow">
@@ -286,7 +288,7 @@ const CoursesPage = () => {
                     </span>
                   </div>
 
-                  <div className="p-4">
+                  <div className="p-4 flex-1">
                     <h3 className="text-md font-semibold text-gray-900 mb-1 line-clamp-2">{course.title}</h3>
                     <p className="text-xs text-gray-500 mb-2">By {course.instructorName ?? course.instructorId}</p>
 
@@ -302,25 +304,33 @@ const CoursesPage = () => {
                     <p className="text-xs text-gray-500 mb-3">
                       {(typeof course.durationInHours === 'number'
                         ? course.durationInHours
-                        : (typeof course.durationInMinutes === 'number' ? Math.round((course.durationInMinutes || 0) / 60) : 0))} Total Hours. {course.lecturesCount ?? 0} Lectures. Beginner
+                        : (typeof course.durationInMinutes === 'number' ? Math.round((course.durationInMinutes || 0) / 60) : 0))} Total Hours. {course.lecturesCount ?? 0} Lectures. {(() => {
+                        if (course.level) return course.level;
+                        if (course.courseLevel === 2) return 'Intermediate';
+                        if (course.courseLevel === 3) return 'Advanced';
+                        return 'Beginner';
+                      })()}
                     </p>
 
                     <div className="flex items-center justify-between">
                       <div className="text-lg font-bold text-gray-900">${(course.price ?? 0).toFixed(2)}</div>
-
-                      <div className="flex items-center gap-2">
-                        <button title="View" onClick={() => navigate(`/courses/view/${course.id}`)} className="p-2 bg-white border border-gray-100 rounded-full text-gray-500 hover:text-gray-900">
-                          <EyeIcon className="h-4 w-4" />
-                        </button>
-                        <button title="Edit" onClick={() => {
-                          navigate(`/courses/edit/${course.id}`);
-                        }} className="p-2 bg-white border border-gray-100 rounded-full text-gray-500 hover:text-gray-900">
-                          <PencilIcon className="h-4 w-4" />
-                        </button>
-                        <button title="Delete" onClick={() => { setSelectedCourse(course); setIsDeleteDialogOpen(true); }} className="p-2 bg-white border border-gray-100 rounded-full text-red-500 hover:text-red-700">
-                          <TrashIcon className="h-4 w-4" />
-                        </button>
-                      </div>
+                    </div>
+                  </div>
+                  <div className="flex gap-3 justify-start items-center p-4 border-t border-gray-100 bg-white">
+                    <div className="rounded-lg shadow-lg bg-white p-2 pb-0">
+                      <button title="View" onClick={() => navigate(`/courses/view/${course.id}`)} className="text-blue-500 hover:text-blue-700">
+                        <EyeIcon className="h-5 w-5" />
+                      </button>
+                    </div>
+                    <div className="rounded-lg shadow-lg bg-white p-2 pb-0">
+                      <button title="Edit" onClick={() => navigate(`/courses/edit/${course.id}`)} className="text-blue-500 hover:text-blue-700">
+                        <PencilIcon className="h-5 w-5" />
+                      </button>
+                    </div>
+                    <div className="rounded-lg shadow-lg bg-white p-2 pb-0">
+                      <button title="Delete" onClick={() => { setSelectedCourse(course); setIsDeleteDialogOpen(true); }} className="text-red-400 hover:text-red-600">
+                        <TrashIcon className="h-5 w-5 mb-0" />
+                      </button>
                     </div>
                   </div>
                 </div>

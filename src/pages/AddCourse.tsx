@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import LoadingBanner from '../components/ui/LoadingBanner';
 import PageHeader from '../components/layout/PageHeader';
 import CourseDetailsForm from '../components/ui/CourseDetailsForm';
 import CourseContentsForm from '../components/ui/CourseContentsForm';
@@ -10,6 +11,7 @@ import { Category } from '../types/api.types';
 
 const AddCoursePage = () => {
   const [step, setStep] = useState(1);
+  const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [instructors, setInstructors] = useState<{ id: number; name: string }[]>([]);
   const [details, setDetails] = useState<any>(null);
@@ -17,6 +19,7 @@ const AddCoursePage = () => {
 
   useEffect(() => {
     // load categories and instructors (simple fetch via courseService or instructor service)
+    setLoading(true);
     (async () => {
       try {
   const catsRaw = await courseService.getAllCategories();
@@ -41,6 +44,8 @@ const AddCoursePage = () => {
         setInstructors(mapped);
       } catch (err) {
         console.error('Failed loading instructors', err);
+      } finally {
+        setLoading(false);
       }
     })();
   }, []);
@@ -112,6 +117,7 @@ const AddCoursePage = () => {
 
   return (
     <div className="space-y-4">
+        {loading && <LoadingBanner message="Loading data..." />}
         <PageHeader title="Add Course" subtitle={<span>Dashboard / Courses / Add Course</span>} />
       <div className="bg-white rounded-2xl p-6 shadow-sm">
 
