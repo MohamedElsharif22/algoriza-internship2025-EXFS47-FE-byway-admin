@@ -6,9 +6,7 @@ const BASE_URL = import.meta.env.VITE_API_URL || 'https://kamalalgointern-001-si
 
 const api = axios.create({
   baseURL: BASE_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  // Do not set a global Content-Type here — let axios/browser set it per-request
 });
 
 // Request interceptor for API calls: attach the shared 'token' value
@@ -18,6 +16,10 @@ api.interceptors.request.use(
     if (token) {
       config.headers = config.headers || {};
       (config.headers as any).Authorization = `Bearer ${token}`;
+      if (import.meta.env.DEV) {
+        // eslint-disable-next-line no-console
+        console.debug('api (secondary): attaching Authorization header, token present');
+      }
     }
     return config;
   },

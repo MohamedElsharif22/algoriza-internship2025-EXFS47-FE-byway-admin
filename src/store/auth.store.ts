@@ -1,4 +1,5 @@
 import { atom } from 'jotai';
+import { AuthUtils } from '../utils/auth.utils';
 
 interface AuthUser {
   email: string;
@@ -15,8 +16,8 @@ interface AuthState {
 }
 
 export const authAtom = atom<AuthState>({
-  isAuthenticated: !!localStorage.getItem('token'),
-  token: localStorage.getItem('token'),
+  isAuthenticated: !!AuthUtils.getToken(),
+  token: AuthUtils.getToken(),
   user: null,
   isAdmin: false,
 });

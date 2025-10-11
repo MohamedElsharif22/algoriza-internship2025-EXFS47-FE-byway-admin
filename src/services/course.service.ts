@@ -78,9 +78,30 @@ export const courseService = {
   },
 
   deleteCourse: async (id: number): Promise<string | void> => {
-    // DELETE /Courses/{id} — let the axios instance already include the base '/api' prefix
-    const response = await api.delete<ApiResponse<string>>(`/Courses/${id}`);
-    return response.data?.message;
+    // DELETE /Courses/{id} — ensure token present and surface server errors clearly
+    const token = (await import('../utils/auth.utils')).AuthUtils.getToken();
+    if (!token) {
+      throw new Error('No auth token available. Please login.');
+    }
+
+    try {
+      const response = await api.delete<ApiResponse<string>>(`/Courses/${id}`);
+      return response.data?.message;
+    } catch (err: any) {
+      // Normalize axios error to include server message and status
+      const serverMessage = err?.response?.data?.message || err?.response?.data || err?.message;
+      const status = err?.response?.status;
+      const details = {
+        status,
+        serverMessage,
+        url: err?.config?.url,
+        method: err?.config?.method,
+      };
+      // Attach details to error for upstream handling
+      const error = new Error(`DeleteCourse failed: ${serverMessage || 'Unknown error'}`);
+      (error as any).details = details;
+      throw error;
+    }
   },
 
   getAllCategories: async (): Promise<Category[]> => {

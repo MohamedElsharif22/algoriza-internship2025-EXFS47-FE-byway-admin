@@ -121,7 +121,25 @@ const CoursesPage = () => {
       fetchCourses();
     } catch (error) {
       console.error('Error deleting course:', error);
-      toast.error('Failed to delete course');
+
+      // If the error was enriched by the service, show the server message and status
+      const anyErr = error as any;
+      const serverMessage = anyErr?.message || anyErr?.details?.serverMessage;
+      const status = anyErr?.details?.status ?? anyErr?.status ?? (anyErr?.response?.status);
+
+      // Provide diagnostic info for 401 specifically
+      if (status === 401) {
+        // Check token presence in localStorage / AuthUtils
+        try {
+          const { AuthUtils } = await import('../utils/auth.utils');
+          const t = AuthUtils.getToken();
+          console.debug('DeleteCourse 401 diagnostics - token present:', !!t, 'token len:', t ? t.length : 0);
+        } catch (diagErr) {
+          console.debug('Failed to read token for diagnostics', diagErr);
+        }
+      }
+
+      toast.error(serverMessage || 'Failed to delete course');
     }
   };
 

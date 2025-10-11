@@ -230,53 +230,12 @@ const InstructorsPage = () => {
         title="View Instructor"
       >
         {selectedInstructor && (
-          <div className="px-6 py-4">
-            <div className="flex items-start gap-6">
-              <div className="relative">
-                <div className="w-20 h-20 rounded-full bg-slate-100 flex items-center justify-center">
-                  <img src={(selectedInstructor as any).profilePictureUrl || (selectedInstructor as any).profilePicture} alt={selectedInstructor.name} className="w-20 h-20 rounded-full object-cover" />
-                </div>
-                <div className="absolute bottom-0 right-0 -translate-y-1/3 translate-x-1/3">
-                  <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-lg">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-
-              <div className="flex-1">
-                <label htmlFor="view-name" className="block text-sm font-medium text-slate-600">Nama</label>
-                <input id="view-name" type="text" value={selectedInstructor.name} readOnly className="mt-2 block w-full rounded-lg border border-slate-100 px-4 py-3 bg-white placeholder-slate-300" />
-
-                <div className="mt-4 grid grid-cols-2 gap-6">
-                  <div>
-                    <label htmlFor="view-jobtitle" className="block text-sm font-medium text-slate-600">Job Title</label>
-                    <select id="view-jobtitle" value={(selectedInstructor as any).jopTitle ?? (selectedInstructor as any).jobTitle} disabled className="mt-2 block w-full rounded-lg border border-slate-100 px-4 py-3 bg-white text-slate-700">
-                      <option>{(selectedInstructor as any).jopTitle ?? (selectedInstructor as any).jobTitle}</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-600">Rate</label>
-                    <div className="mt-2 flex items-center gap-2">
-                      {[1,2,3,4,5].map((star)=> (
-                        <svg key={star} className={`w-6 h-6 ${star <= Math.round((selectedInstructor as any).averageRating ?? (selectedInstructor as any).rating) ? 'text-yellow-400' : 'text-slate-300'}`} viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.177 3.623a1 1 0 00.95.69h3.805c.969 0 1.371 1.24.588 1.81l-3.08 2.24a1 1 0 00-.364 1.118l1.177 3.623c.3.921-.755 1.688-1.54 1.118l-3.08-2.24a1 1 0 00-1.176 0l-3.08 2.24c-.784.57-1.838-.197-1.539-1.118l1.177-3.623a1 1 0 00-.364-1.118L2.34 9.05c-.783-.57-.38-1.81.588-1.81h3.804a1 1 0 00.951-.69L9.05 2.927z"/></svg>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-4">
-                  <label htmlFor="view-description" className="block text-sm font-medium text-slate-600">Description</label>
-                  <textarea id="view-description" readOnly value={(selectedInstructor as any).about} className="mt-2 block w-full rounded-lg border border-slate-100 px-4 py-3 h-28 bg-white placeholder-slate-300" />
-                </div>
-
-                <div className="mt-6">
-                  <Button variant="secondary" onClick={() => setIsViewDialogOpen(false)} className="w-full">Close</Button>
-                </div>
-              </div>
-            </div>
-          </div>
+          <InstructorForm
+            instructor={selectedInstructor}
+            onSubmit={async () => {}}
+            onCancel={() => setIsViewDialogOpen(false)}
+            readOnly
+          />
         )}
       </Dialog>
 

@@ -16,9 +16,10 @@ api.interceptors.request.use(
     if (token) {
       config.headers = config.headers || {};
       (config.headers as any).Authorization = `Bearer ${token}`;
+      // Dev-only: log when we attach a token (do not log token value)
       if (import.meta.env.DEV) {
         // eslint-disable-next-line no-console
-        console.debug('[api] attaching token to request', { url: config.url, hasToken: !!token });
+        console.debug('api: attaching Authorization header, token present');
       }
     }
     return config;

@@ -46,9 +46,15 @@ const Dialog = ({ open, onClose, title, children, maxWidth = 'md' }: DialogProps
               leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
             >
               <HeadlessDialog.Panel
-                className={`relative transform rounded-lg bg-white px-4 pb-4 pt-5 text-left shadow-xl transition-all sm:my-8 sm:w-full ${maxWidthClasses[maxWidth]} sm:p-6`}
+                className={`relative transform rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full ${maxWidthClasses[maxWidth]}`}
               >
-                <div className="absolute right-0 top-0 hidden pr-4 pt-4 sm:block">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+                  <HeadlessDialog.Title
+                    as="h3"
+                    className="text-xl font-semibold leading-6 text-gray-900"
+                  >
+                    {title}
+                  </HeadlessDialog.Title>
                   <button
                     type="button"
                     className="rounded-md bg-white text-gray-400 hover:text-gray-500 focus:outline-none"
@@ -59,13 +65,7 @@ const Dialog = ({ open, onClose, title, children, maxWidth = 'md' }: DialogProps
                   </button>
                 </div>
                 <div>
-                  <HeadlessDialog.Title
-                    as="h3"
-                    className="text-lg font-semibold leading-6 text-gray-900 mb-4"
-                  >
-                    {title}
-                  </HeadlessDialog.Title>
-                  <div>{children}</div>
+                  {children}
                 </div>
               </HeadlessDialog.Panel>
             </Transition.Child>

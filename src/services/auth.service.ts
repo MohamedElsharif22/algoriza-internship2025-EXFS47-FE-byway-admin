@@ -27,7 +27,7 @@ export const authService = {
   },
 
   getToken: () => {
-    return localStorage.getItem('token');
+    return AuthUtils.getToken();
   },
 
   isAuthenticated: () => {
