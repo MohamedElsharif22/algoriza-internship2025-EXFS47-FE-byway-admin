@@ -95,7 +95,7 @@ const ViewCoursePage = () => {
               {step === 2 && (
                 <button
                   aria-label="Back to details"
-                  className="inline-flex items-center  text-5xl  text-gray-700 rounded-md hover:bg-gray-100"
+                  className="inline-flex items-center text-4xl  text-gray-700 rounded-md hover:bg-gray-100"
                   onClick={() => setStep(1)}
                 >
                   ←
@@ -104,7 +104,7 @@ const ViewCoursePage = () => {
               {step === 1 && (
                 <button
                   aria-label="View contents"
-                  className="inline-flex items-center  text-5xl  text-gray-700 rounded-md hover:bg-gray-100"
+                  className="inline-flex items-center  text-4xl  text-gray-700 rounded-md hover:bg-gray-100"
                   onClick={() => setStep(2)}
                 >
                   →
