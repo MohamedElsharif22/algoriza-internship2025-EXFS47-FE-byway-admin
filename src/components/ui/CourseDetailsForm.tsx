@@ -33,9 +33,10 @@ interface Props {
   onNext?: (values: CourseDetailsValues) => void;
   onCancel?: () => void;
   disabled?: boolean;
+  showHeader?: boolean;
 }
 
-const CourseDetailsForm: React.FC<Props> = ({ initialValues = {}, categories, instructors, levels = [], onNext, onCancel, disabled = false }) => {
+const CourseDetailsForm: React.FC<Props> = ({ initialValues = {}, categories, instructors, levels = [], onNext, onCancel, disabled = false, showHeader = true }) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const validationSchema = Yup.object().shape({
@@ -87,8 +88,8 @@ const CourseDetailsForm: React.FC<Props> = ({ initialValues = {}, categories, in
 
   return (
     <form onSubmit={formik.handleSubmit} className="space-y-6">
-      {isLoading && <LoadingBanner message="Saving course details..." />}
-      <h3 className="text-xl font-semibold text-gray-900">Course details</h3>
+  {isLoading && <LoadingBanner message="Saving course details..." />}
+  {showHeader && <h3 className="text-xl font-semibold text-gray-900">Course details</h3>}
 
       <div className="border border-gray-200 rounded-lg p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row gap-4">

@@ -82,46 +82,61 @@ const ViewCoursePage = () => {
 
   return (
     <div className="space-y-4">
-      {loading && <LoadingBanner message="Loading course details..." /> >
-        <div className="bg-white rounded-2xl p-6 shadow-sm">
-          <PageHeader title="View Course" subtitle={<span>Dashboard / Courses / View Course</span>} />
-          <div className="mt-4">
-            <div className="text-sm text-gray-500 mb-4">Step {step} of 2</div>
-            <div className="flex justify-end mb-3">
-              {step === 1 ? (
-                <button className="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-gray-200" onClick={() => setStep(2)}>
-                  View Contents →
-                </button>
-              ) : (
-                <button className="inline-flex items-center px-3 py-1 bg-gray-100 text-gray-700 rounded-md text-sm hover:bg-gray-200" onClick={() => setStep(1)}>
-                  ← Back to Details
-                </button>
-              )}
+      {loading && <LoadingBanner message="Loading course details..." />}
+        <PageHeader title="View Course" subtitle={<span>Dashboard / Courses / View Course</span>} />
+      <div className="bg-white rounded-2xl p-6 shadow-sm">
+        <div className="mt-4">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-3">
+              <h3 className="text-xl font-semibold text-gray-900">Course details</h3>
+              <div className="text-sm text-gray-500">Step {step} of 2</div>
             </div>
-
-            <div className="bg-white rounded-lg p-6">
-              {details && step === 1 && (
-                <CourseDetailsForm
-                  initialValues={details}
-                  categories={categories}
-                  instructors={instructors}
-                  onCancel={() => navigate('/courses')}
-                  disabled={true}
-                />
+            <div className="flex items-center gap-2">
+              {step === 2 && (
+                <button
+                  aria-label="Back to details"
+                  className="inline-flex items-center  text-5xl  text-gray-700 rounded-md hover:bg-gray-100"
+                  onClick={() => setStep(1)}
+                >
+                  ←
+                </button>
               )}
-
-              {details && step === 2 && (
-                <CourseContentsForm
-                  initialContents={details.existingContents ?? []}
-                  onBack={() => setStep(1)}
-                  onSubmit={() => { }}
-                  disabled={true}
-                />
+              {step === 1 && (
+                <button
+                  aria-label="View contents"
+                  className="inline-flex items-center  text-5xl  text-gray-700 rounded-md hover:bg-gray-100"
+                  onClick={() => setStep(2)}
+                >
+                  →
+                </button>
               )}
             </div>
           </div>
+
+          <div className="bg-white rounded-lg p-6">
+            {details && step === 1 && (
+              <CourseDetailsForm
+                initialValues={details}
+                categories={categories}
+                instructors={instructors}
+                onCancel={() => navigate('/courses')}
+                disabled={true}
+                showHeader={false}
+              />
+            )}
+
+            {details && step === 2 && (
+              <CourseContentsForm
+                initialContents={details.existingContents ?? []}
+                onBack={() => setStep(1)}
+                onSubmit={() => { }}
+                disabled={true}
+              />
+            )}
+          </div>
         </div>
-      }</div>
+      </div>
+    </div>
   );
 };
 

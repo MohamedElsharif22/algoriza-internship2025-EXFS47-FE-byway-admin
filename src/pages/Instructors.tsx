@@ -90,6 +90,12 @@ const InstructorsPage = () => {
     }
   };
 
+  // Clicking a row should open the view dialog (all screen sizes)
+  const handleRowClick = (instructor: any) => {
+    setSelectedInstructor(instructor);
+    setIsViewDialogOpen(true);
+  };
+
   // Columns configuration removed — page renders a custom table below
 
   return (
@@ -137,7 +143,7 @@ const InstructorsPage = () => {
             </thead>
             <tbody className="bg-white divide-y divide-slate-100">
               {(instructors.data || []).map((instructor: any, idx: number) => (
-                <tr key={instructor.id || idx}>
+                <tr key={instructor.id || idx} onClick={() => handleRowClick(instructor)} className="cursor-pointer hover:bg-slate-50 transition-colors">
                   <td className="px-6 py-4 text-slate-700 text-base flex items-center gap-3">
                     <img src={instructor.profilePictureUrl} alt={instructor.name} className="w-8 h-8 rounded-full object-cover" />
                     {instructor.name}
@@ -160,18 +166,19 @@ const InstructorsPage = () => {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <div className="flex justify-end gap-4">
-                      <button className="text-blue-500 hover:text-blue-700" title="View" onClick={() => { setSelectedInstructor(instructor); setIsViewDialogOpen(true); }}>
+                      <button className="text-blue-500 hover:text-blue-700 p-2 rounded-full bg-white hover:bg-slate-100 transition" title="View" onClick={(e) => { e.stopPropagation(); setSelectedInstructor(instructor); setIsViewDialogOpen(true); }}>
                         <EyeIcon className="h-5 w-5" />
                       </button>
                       <button
-                        className="text-blue-500 hover:text-blue-700" title="Edit"
-                        onClick={() => {
+                        className="text-blue-500 hover:text-blue-700 p-2 rounded-full bg-white hover:bg-slate-100 transition" title="Edit"
+                        onClick={(e) => {
+                          e.stopPropagation();
                           setSelectedInstructor(instructor);
                           setIsEditDialogOpen(true);
                         }}>
                         <PencilIcon className="h-5 w-5" />
                       </button>
-                      <button className="text-red-400 hover:text-red-600" title="Delete" onClick={() => { setSelectedInstructor(instructor); setIsDeleteDialogOpen(true); }}>
+                      <button className="text-red-400 hover:text-red-600 p-2 rounded-full bg-white hover:bg-slate-100 transition" title="Delete" onClick={(e) => { e.stopPropagation(); setSelectedInstructor(instructor); setIsDeleteDialogOpen(true); }}>
                         <TrashIcon className="h-5 w-5" />
                       </button>
                     </div>
@@ -230,12 +237,22 @@ const InstructorsPage = () => {
         title="View Instructor"
       >
         {selectedInstructor && (
-          <InstructorForm
-            instructor={selectedInstructor}
-            onSubmit={async () => {}}
-            onCancel={() => setIsViewDialogOpen(false)}
-            readOnly
-          />
+          <div className="space-y-4">
+            <InstructorForm
+              instructor={selectedInstructor}
+              onSubmit={async () => {}}
+              onCancel={() => setIsViewDialogOpen(false)}
+              readOnly
+            />
+            <div className="flex justify-end gap-3">
+              <button className="text-blue-500 hover:text-blue-700 rounded-lg px-4 py-2 bg-white shadow-sm" onClick={() => { setIsViewDialogOpen(false); setSelectedInstructor(selectedInstructor); setIsEditDialogOpen(true); }}>
+                <PencilIcon className="inline-block h-4 w-4 mr-2" /> Edit
+              </button>
+              <button className="text-red-500 hover:text-red-700 rounded-lg px-4 py-2 bg-white shadow-sm" onClick={() => { setIsViewDialogOpen(false); setSelectedInstructor(selectedInstructor); setIsDeleteDialogOpen(true); }}>
+                <TrashIcon className="inline-block h-4 w-4 mr-2" /> Delete
+              </button>
+            </div>
+          </div>
         )}
       </Dialog>
 

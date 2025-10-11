@@ -280,9 +280,9 @@ const CoursesPage = () => {
               </div>
             ) : (
               (courses.data || []).map((course) => (
-                <div key={course.id} className="rounded-2xl overflow-hidden bg-white border border-gray-100  shadow-gray-200 shadow-sm flex flex-col justify-between h-full">
-                  <div className="relative rounded-lg overflow-hidden ove p-3">
-                    <img src={course.coverPictureUrl ?? course.coverPicture} alt={course.title} className="w-full h-44 object-cover rounded-lg shadow-sm" />
+                <div key={course.id} className="rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-gray-200 shadow-sm flex flex-col justify-between h-full hover:shadow-lg transition-shadow">
+                  <div className="relative rounded-lg overflow-hidden ove p-3 hover:opacity-95 transition-opacity">
+                    <img src={course.coverPictureUrl ?? course.coverPicture} alt={course.title} className="w-full h-44 object-cover rounded-xl shadow-sm" />
                     <span className="absolute top-5 left-5 bg-white/95 text-xs px-3 py-1 rounded-full font-medium text-primary-600 shadow">
                       {course.categoryName || categories.find((c) => c.id === course.categoryId)?.name}
                     </span>
@@ -317,18 +317,18 @@ const CoursesPage = () => {
                     </div>
                   </div>
                   <div className="flex gap-3 justify-start items-center p-4 bg-white">
-                    <div className="rounded-lg shadow-lg bg-white p-2 pb-0">
-                      <button title="View" onClick={() => navigate(`/courses/view/${course.id}`)} className="text-blue-500 hover:text-blue-700">
+                    <div className="rounded-lg shadow-lg bg-white p-2 pb-0 hover:bg-slate-50 transition">
+                      <button title="View" onClick={() => navigate(`/courses/view/${course.id}`)} className="text-blue-500 hover:text-blue-700 p-1">
                         <EyeIcon className="h-5 w-5" />
                       </button>
                     </div>
-                    <div className="rounded-lg shadow-lg bg-white p-2 pb-0">
-                      <button title="Edit" onClick={() => navigate(`/courses/edit/${course.id}`)} className="text-blue-500 hover:text-blue-700">
+                    <div className="rounded-lg shadow-lg bg-white p-2 pb-0 hover:bg-slate-50 transition">
+                      <button title="Edit" onClick={() => navigate(`/courses/edit/${course.id}`)} className="text-blue-500 hover:text-blue-700 p-1">
                         <PencilIcon className="h-5 w-5" />
                       </button>
                     </div>
-                    <div className="rounded-lg shadow-lg bg-white p-2 pb-0">
-                      <button title="Delete" onClick={() => { setSelectedCourse(course); setIsDeleteDialogOpen(true); }} className="text-red-400 hover:text-red-600">
+                    <div className="rounded-lg shadow-lg bg-white p-2 pb-0 hover:bg-slate-50 transition">
+                      <button title="Delete" onClick={() => { setSelectedCourse(course); setIsDeleteDialogOpen(true); }} className="text-red-400 hover:text-red-600 p-1">
                         <TrashIcon className="h-5 w-5 mb-0" />
                       </button>
                     </div>
