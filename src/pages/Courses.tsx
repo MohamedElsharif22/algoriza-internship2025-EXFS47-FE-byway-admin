@@ -281,9 +281,9 @@ const CoursesPage = () => {
             ) : (
               (courses.data || []).map((course) => (
                 <div key={course.id} className="rounded-2xl overflow-hidden bg-white shadow-sm border border-gray-100 flex flex-col justify-between h-full">
-                  <div className="relative">
-                    <img src={course.coverPictureUrl ?? course.coverPicture} alt={course.title} className="w-full h-44 object-cover" />
-                    <span className="absolute top-3 left-3 bg-white/95 text-xs px-3 py-1 rounded-full font-medium text-primary-600 shadow">
+                  <div className="relative rounded-lg overflow-hidden ove p-3">
+                    <img src={course.coverPictureUrl ?? course.coverPicture} alt={course.title} className="w-full h-44 object-cover rounded-lg shadow-sm" />
+                    <span className="absolute top-5 left-5 bg-white/95 text-xs px-3 py-1 rounded-full font-medium text-primary-600 shadow">
                       {course.categoryName || categories.find((c) => c.id === course.categoryId)?.name}
                     </span>
                   </div>
@@ -316,7 +316,7 @@ const CoursesPage = () => {
                       <div className="text-lg font-bold text-gray-900">${(course.price ?? 0).toFixed(2)}</div>
                     </div>
                   </div>
-                  <div className="flex gap-3 justify-start items-center p-4 border-t border-gray-100 bg-white">
+                  <div className="flex gap-3 justify-start items-center p-4 bg-white">
                     <div className="rounded-lg shadow-lg bg-white p-2 pb-0">
                       <button title="View" onClick={() => navigate(`/courses/view/${course.id}`)} className="text-blue-500 hover:text-blue-700">
                         <EyeIcon className="h-5 w-5" />
