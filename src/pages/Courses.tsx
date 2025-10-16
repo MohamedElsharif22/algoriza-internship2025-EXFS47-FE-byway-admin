@@ -255,7 +255,20 @@ const CoursesPage = () => {
                             </button>
                             <button
                               onClick={() => {
-                                setFilters({ ...filters, search: undefined, pageIndex: 1, sort: 5, pageSize: 9 });
+                                // Reset all filters to defaults
+                                setFilters({
+                                  pageSize: 9,
+                                  pageIndex: 1,
+                                  sort: 5, // Newest by default
+                                  search: undefined,
+                                  categories: undefined,
+                                  priceRange: undefined,
+                                  rangeOfLectures: undefined
+                                });
+                                setSearchTerm('');
+                                setPopoverCategories(undefined);
+                                setPopoverSort(5);
+                                setPopoverPageSize(9);
                                 setFilterMenuOpen(false);
                               }}
                               className="flex-1 border border-gray-200 px-3 py-2 rounded-lg text-sm"
@@ -280,7 +293,15 @@ const CoursesPage = () => {
               </div>
             ) : (
               (courses.data || []).map((course) => (
-                <div key={course.id} className="rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-gray-200 shadow-sm flex flex-col justify-between h-full hover:shadow-lg transition-shadow">
+                <div 
+                  key={course.id} 
+                  onClick={(e) => {
+                    // Don't navigate if clicking on action buttons
+                    const target = e.target as HTMLElement;
+                    if (target.closest('button')) return;
+                    navigate(`/courses/view/${course.id}`);
+                  }}
+                  className="rounded-2xl overflow-hidden bg-white border border-gray-100 shadow-gray-200 shadow-sm flex flex-col justify-between h-full hover:shadow-lg transition-shadow cursor-pointer">
                   <div className="relative rounded-lg overflow-hidden ove p-3 hover:opacity-95 transition-opacity">
                     <img src={course.coverPictureUrl ?? course.coverPicture} alt={course.title} className="w-full h-44 object-cover rounded-xl shadow-sm" />
                     <span className="absolute top-5 left-5 bg-white/95 text-xs px-3 py-1 rounded-full font-medium text-primary-600 shadow">
