@@ -46,6 +46,8 @@ const ContentComponent = ({ idx, formik, canDelete, onDelete, disabled }: { idx:
 					) : (
 						<input
 							type="number"
+							min={1}
+							step={1}
 							className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
 							{...formik.getFieldProps(`contents.${idx}.lecturesCount`)}
 							placeholder="Write here"
@@ -63,6 +65,8 @@ const ContentComponent = ({ idx, formik, canDelete, onDelete, disabled }: { idx:
 					) : (
 						<input
 							type="number"
+							min={0.01}
+							step={0.01}
 							className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
 							{...formik.getFieldProps(`contents.${idx}.durationInHours`)}
 							placeholder="Write here"
@@ -94,8 +98,15 @@ const CourseContentsForm: React.FC<Props> = ({
 		contents: Yup.array().of(
 			Yup.object({
 				name: Yup.string().required('Name required'),
-				lecturesCount: Yup.number().typeError('Required').required('Lectures required'),
-				durationInHours: Yup.number().typeError('Required').required('Duration required'),
+				lecturesCount: Yup.number()
+					.typeError('Lectures must be a number')
+					.integer('Lectures must be a whole number')
+					.min(1, 'Lectures must be at least 1')
+					.required('Lectures required'),
+				durationInHours: Yup.number()
+					.typeError('Duration must be a number')
+					.moreThan(0, 'Duration must be greater than 0')
+					.required('Duration required'),
 			})
 		),
 	});
