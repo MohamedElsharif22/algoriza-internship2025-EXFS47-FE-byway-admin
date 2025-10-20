@@ -21,6 +21,8 @@ interface Props {
 
 const ContentComponent = ({ idx, formik, canDelete, onDelete, disabled }: { idx: number; formik: any; canDelete: boolean; onDelete: () => void; disabled?: boolean }) => (
 	<div className="bg-gray-50 rounded-lg p-6 mb-4 border border-gray-100">
+		{/* Hidden input for content id, always included so it is submitted with the form */}
+		<input type="hidden" name={`contents.${idx}.id`} value={formik.values.contents?.[idx]?.id ?? ''} />
 		<div className="space-y-4">
 			<div>
 				<label className="block text-gray-900 font-medium mb-2">Name</label>
@@ -98,12 +100,16 @@ const CourseContentsForm: React.FC<Props> = ({
 		contents: Yup.array().of(
 			Yup.object({
 				name: Yup.string().required('Name required'),
+				// Coerce empty string -> undefined so required() triggers correctly
 				lecturesCount: Yup.number()
+					.transform((value, originalValue) => (typeof originalValue === 'string' && originalValue.trim() === '' ? undefined : value))
 					.typeError('Lectures must be a number')
 					.integer('Lectures must be a whole number')
 					.min(1, 'Lectures must be at least 1')
 					.required('Lectures required'),
+				// Allow decimals for duration; coerce empty string -> undefined
 				durationInHours: Yup.number()
+					.transform((value, originalValue) => (typeof originalValue === 'string' && originalValue.trim() === '' ? undefined : value))
 					.typeError('Duration must be a number')
 					.moreThan(0, 'Duration must be greater than 0')
 					.required('Duration required'),
@@ -112,6 +118,7 @@ const CourseContentsForm: React.FC<Props> = ({
 	});
 
 	const normalizedInitialContents = initialContents.map((item: any) => ({
+		id: item.id ?? undefined,
 		name: item.name ?? '',
 		lecturesCount: item.lecturesCount ?? item.lecturesNumber ?? '',
 		durationInHours: item.durationInHours ?? item.time ?? '',

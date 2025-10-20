@@ -136,12 +136,20 @@ const EditCoursePage = () => {
         formData.append('CoverPictureUrl', details.coverPictureUrl);
       }
 
-  const normalizedContents = contents.map((c, idx) => ({ contentId: idx + 1, Name: c.name, LecturesCount: Number(c.lecturesCount), DurationInHours: Number(c.durationInHours) }));
+      // Preserve existing content IDs (if present) so the server can update existing records.
+      const normalizedContents = contents.map((c, idx) => ({
+        ContentId: c.id ?? (idx + 1), // Always include id if present
+        Name: c.name,
+        LecturesCount: Number(c.lecturesCount),
+        DurationInHours: Number(c.durationInHours),
+      }));
+
+      // Always include ContentId in both JSON and indexed fields
       formData.append('Contents', JSON.stringify(normalizedContents));
       normalizedContents.forEach((item, idx) => {
-        formData.append(`Contents[${idx}].contentId`, String(item.contentId));
+        formData.append(`Contents[${idx}].ContentId`, String(item.ContentId));
         formData.append(`Contents[${idx}].Name`, String(item.Name));
-  formData.append(`Contents[${idx}].LecturesCount`, String(item.LecturesCount));
+        formData.append(`Contents[${idx}].LecturesCount`, String(item.LecturesCount));
         formData.append(`Contents[${idx}].DurationInHours`, String(item.DurationInHours));
       });
 
